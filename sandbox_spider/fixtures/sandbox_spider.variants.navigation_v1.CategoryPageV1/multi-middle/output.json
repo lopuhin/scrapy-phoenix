@@ -1,0 +1,115 @@
+{
+  "categoryName": "Running Shoes",
+  "items": [
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/3bd54863-7974-490b-b5ba-5e93bfc77282"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/c1f37837-8d78-4178-8935-a2789645dec1"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/5735773c-761e-4287-907c-5e53b8f6703b"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/3016b62b-d886-4545-9025-ac1815fbf5dc"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/6aed979f-b2ac-4768-b122-4f43c5274f35"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/8ef65ee8-da5a-4bc3-b331-5c49704d628f"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/dfae1803-93d7-47e7-a392-3df45fec59ac"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/027a76dc-bce0-4aef-b17f-a5c04e39f65a"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/38772265-102c-41a3-ab40-4598ae11d3c2"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/6c8de840-ed30-4556-a2a5-3193a6a1cc2b"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/5719d3e4-16d1-4768-9c83-90ba1672380e"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/be9f44cb-302b-4401-afed-098b979a7368"
+    }
+  ],
+  "metadata": {
+    "dateDownloaded": "2026-09-28T19:27:04Z",
+    "validationMessages": null
+  },
+  "nextPage": {
+    "body": null,
+    "headers": null,
+    "method": "GET",
+    "name": null,
+    "url": "http://127.0.0.1:8765/sandbox-store/category/cat_1_sub_2?page=4"
+  },
+  "pageNumber": 3,
+  "subCategories": null,
+  "url": "http://127.0.0.1:8765/sandbox-store/category/cat_1_sub_2?page=3"
+}

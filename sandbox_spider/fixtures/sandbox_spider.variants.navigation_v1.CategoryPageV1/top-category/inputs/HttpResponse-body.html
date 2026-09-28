@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Electronics - Sandbox Store</title>
+    <style>
+        /* Simple Reset */
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: #f9f9f9; color: #333; }
+
+        /* Header */
+        header { background: #fff; padding: 1rem 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        header a.logo { font-size: 1.5rem; font-weight: bold; color: #333; text-decoration: none; }
+        nav a { margin-left: 1rem; color: #555; text-decoration: none; }
+        nav a:hover { color: #000; }
+
+        /* Main Container */
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+
+        /* Grid System */
+        .grid { display: grid; gap: 2rem; }
+        .grid-3 { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+        .grid-4 { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+
+        /* Cards */
+        .card { background: #fff; border: 1px solid #e1e1e1; border-radius: 8px; overflow: hidden; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .card img { width: 100%; height: 200px; object-fit: cover; }
+        .card-body { padding: 1rem; }
+        .card-title { margin: 0 0 0.5rem; font-size: 1.1rem; }
+        .card-price { color: #e91e63; font-weight: bold; font-size: 1.2rem; }
+        .card a { text-decoration: none; color: inherit; display: block; }
+
+        /* Pagination */
+        .pagination { display: flex; justify-content: center; margin-top: 2rem; gap: 0.5rem; }
+        .pagination a { padding: 0.5rem 1rem; border: 1px solid #ddd; background: #fff; text-decoration: none; color: #333; border-radius: 4px; }
+        .pagination a.active { background: #007bff; color: #fff; border-color: #007bff; }
+        .pagination span { padding: 0.5rem 1rem; color: #777; }
+
+        /* Breadcrumbs */
+        .breadcrumbs { margin-bottom: 1rem; font-size: 0.9rem; color: #666; }
+        .breadcrumbs a { color: #007bff; text-decoration: none; }
+
+        /* Details */
+        .product-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; background: #fff; padding: 2rem; border-radius: 8px; }
+        .product-info h1 { margin-top: 0; }
+        .price-tag { font-size: 2rem; color: #e91e63; font-weight: bold; margin: 1rem 0; }
+        .btn-buy { background: #007bff; color: white; border: none; padding: 1rem 2rem; font-size: 1.2rem; border-radius: 4px; cursor: pointer; }
+        .attributes { margin-top: 2rem; }
+        .attributes dt { font-weight: bold; margin-top: 0.5rem; }
+        .attributes dd { margin: 0; color: #555; }
+
+        footer { text-align: center; padding: 2rem; color: #777; margin-top: 4rem; border-top: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/sandbox-store/" class="logo">SandboxStore</a>
+        <nav>
+            <a href="/sandbox-store/">Home</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        
+<div class="breadcrumbs">
+    <a href="/sandbox-store/">Home</a> &gt;
+    
+    <span>Electronics</span>
+</div>
+
+<h1>Electronics</h1>
+
+
+<div class="grid grid-4" style="margin-bottom: 3rem;">
+    
+    <div class="card">
+        <a href="/sandbox-store/category/cat_0_sub_0">
+            <div class="card-body" style="text-align: center; padding: 2rem 1rem;">
+                <h3 class="card-title">Smartphones</h3>
+            </div>
+        </a>
+    </div>
+    
+    <div class="card">
+        <a href="/sandbox-store/category/cat_0_sub_1">
+            <div class="card-body" style="text-align: center; padding: 2rem 1rem;">
+                <h3 class="card-title">Laptops</h3>
+            </div>
+        </a>
+    </div>
+    
+    <div class="card">
+        <a href="/sandbox-store/category/cat_0_sub_2">
+            <div class="card-body" style="text-align: center; padding: 2rem 1rem;">
+                <h3 class="card-title">Headphones</h3>
+            </div>
+        </a>
+    </div>
+    
+    <div class="card">
+        <a href="/sandbox-store/category/cat_0_sub_3">
+            <div class="card-body" style="text-align: center; padding: 2rem 1rem;">
+                <h3 class="card-title">Cameras</h3>
+            </div>
+        </a>
+    </div>
+    
+    <div class="card">
+        <a href="/sandbox-store/category/cat_0_sub_4">
+            <div class="card-body" style="text-align: center; padding: 2rem 1rem;">
+                <h3 class="card-title">Smart Watches</h3>
+            </div>
+        </a>
+    </div>
+    
+</div>
+
+
+<div class="grid grid-3">
+    
+</div>
+
+<!-- Pagination -->
+<div class="pagination">
+    
+
+    
+
+    
+</div>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Zyte Monitoring Sandbox. Fake Data.</p>
+    </footer>
+</body>
+</html>

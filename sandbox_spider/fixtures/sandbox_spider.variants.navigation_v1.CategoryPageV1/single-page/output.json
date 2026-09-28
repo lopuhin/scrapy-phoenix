@@ -1,0 +1,133 @@
+{
+  "categoryName": "Gardening Tools",
+  "items": [
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/d2478bb2-8945-49ec-8850-3e9d7e1b2034"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/6bfdc189-b705-40f8-94ba-0d7c1567f88e"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/bf8f81ea-cfb0-468d-b189-25a6c6cec51b"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/00bbd543-5c98-4d57-bc35-9ce2165607c0"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/79533cb7-8ef1-4114-9cc6-24ef04643f52"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/596ed71c-e94f-43ec-8f40-76a21c33345d"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/d1aaab53-c755-46c2-9de4-cd87d96da200"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/da72ab37-d5d3-48cf-a4e6-5ffd75dc037d"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/35f2e254-3e14-4f6a-abcb-b347e9b758ee"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/1e032a65-2346-426d-bf3b-16810e4d364e"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/06beab4a-bbab-4b0e-a0a1-451d24a0aaad"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/1b2375d0-b38f-40f2-8dd8-67e55f26b2a6"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/980b82cb-d662-48bf-ba11-4e5612e29c2a"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/242ac30f-5d80-453b-a59a-5d6c07ba408b"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/d4c0df28-91b5-4cb4-8331-bd0d13ba8d24"
+    }
+  ],
+  "metadata": {
+    "dateDownloaded": "2026-09-28T19:27:04Z",
+    "validationMessages": null
+  },
+  "nextPage": null,
+  "pageNumber": 1,
+  "subCategories": null,
+  "url": "http://127.0.0.1:8765/sandbox-store/category/cat_2_sub_3"
+}

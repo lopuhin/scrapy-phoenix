@@ -1,0 +1,66 @@
+{
+  "additionalProperties": [
+    {
+      "name": "Warranty",
+      "value": "1 Year"
+    },
+    {
+      "name": "Condition",
+      "value": "New"
+    }
+  ],
+  "aggregateRating": {
+    "bestRating": 5.0,
+    "ratingValue": 2.6,
+    "reviewCount": 34
+  },
+  "availability": "OutOfStock",
+  "brand": {
+    "name": "Bose"
+  },
+  "breadcrumbs": [
+    {
+      "name": "Home",
+      "url": "http://127.0.0.1:8765/sandbox-store/"
+    },
+    {
+      "name": "Electronics",
+      "url": "http://127.0.0.1:8765/sandbox-store/category/cat_0"
+    },
+    {
+      "name": "Smartphones",
+      "url": "http://127.0.0.1:8765/sandbox-store/category/cat_0_sub_0"
+    }
+  ],
+  "canonicalUrl": null,
+  "color": "Black",
+  "currency": "USD",
+  "currencyRaw": "USD",
+  "description": "Experience the ultimate performance with the Bose Today Smartphone. Featuring a sleek Black finish and cutting-edge technology, it's designed to keep up with your busy lifestyle. Backed by a 1 Year warranty.",
+  "descriptionHtml": "<article>\n\n<p>Experience the ultimate performance with the Bose Today Smartphone. Featuring a sleek Black finish and cutting-edge technology, it&#x27;s designed to keep up with your busy lifestyle. Backed by a 1 Year warranty.</p>\n\n</article>",
+  "features": null,
+  "gtin": null,
+  "images": [
+    {
+      "url": "https://placehold.co/300x300?text=Bose+Smartphone"
+    }
+  ],
+  "mainImage": {
+    "url": "https://placehold.co/300x300?text=Bose+Smartphone"
+  },
+  "metadata": {
+    "dateDownloaded": "2026-09-28T19:27:04Z",
+    "probability": 1.0,
+    "validationMessages": null
+  },
+  "mpn": null,
+  "name": "Bose Today Smartphone",
+  "price": "1629.59",
+  "productId": "14822f53-8201-4c62-b5f5-9b220e8fa8e0",
+  "regularPrice": null,
+  "size": null,
+  "sku": null,
+  "style": null,
+  "url": "http://127.0.0.1:8765/sandbox-store/product/14822f53-8201-4c62-b5f5-9b220e8fa8e0",
+  "variants": null
+}

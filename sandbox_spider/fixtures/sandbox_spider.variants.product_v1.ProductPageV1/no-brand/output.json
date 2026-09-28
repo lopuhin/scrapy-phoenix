@@ -1,0 +1,64 @@
+{
+  "additionalProperties": [
+    {
+      "name": "Material",
+      "value": "Glass"
+    },
+    {
+      "name": "Dimensions",
+      "value": "Large"
+    }
+  ],
+  "aggregateRating": {
+    "bestRating": 5.0,
+    "ratingValue": 4.2,
+    "reviewCount": 305
+  },
+  "availability": "InStock",
+  "brand": null,
+  "breadcrumbs": [
+    {
+      "name": "Home",
+      "url": "http://127.0.0.1:8765/sandbox-store/"
+    },
+    {
+      "name": "Home & Garden",
+      "url": "http://127.0.0.1:8765/sandbox-store/category/cat_2"
+    },
+    {
+      "name": "Furniture",
+      "url": "http://127.0.0.1:8765/sandbox-store/category/cat_2_sub_0"
+    }
+  ],
+  "canonicalUrl": null,
+  "color": "White",
+  "currency": "USD",
+  "currencyRaw": "USD",
+  "description": "Enhance your home with the Fact Rate Furniture. Its timeless White finish and sturdy construction make it a favorite among interior designers.",
+  "descriptionHtml": "<article>\n\n<p>Enhance your home with the Fact Rate Furniture. Its timeless White finish and sturdy construction make it a favorite among interior designers.</p>\n\n</article>",
+  "features": null,
+  "gtin": null,
+  "images": [
+    {
+      "url": "https://placehold.co/300x300?text=Fact+Furniture"
+    }
+  ],
+  "mainImage": {
+    "url": "https://placehold.co/300x300?text=Fact+Furniture"
+  },
+  "metadata": {
+    "dateDownloaded": "2026-09-28T19:27:04Z",
+    "probability": 1.0,
+    "validationMessages": null
+  },
+  "mpn": null,
+  "name": "Fact Rate Furniture",
+  "price": "567.27",
+  "productId": "3cfe18e9-5f20-4c06-9ace-863187638104",
+  "regularPrice": null,
+  "size": null,
+  "sku": null,
+  "style": null,
+  "url": "http://127.0.0.1:8765/sandbox-store/product/3cfe18e9-5f20-4c06-9ace-863187638104",
+  "variants": null
+}

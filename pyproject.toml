@@ -1,0 +1,25 @@
+[project]
+name = "scrapy-self-heal"
+version = "0.0.1"
+description = "Prototype: a Scrapy spider that detects site drift and repairs itself mid-crawl"
+requires-python = ">=3.12"
+dependencies = [
+    "scrapy>=2.19",
+    "web-poet>=0.24",
+    "zyte-common-items>=0.29",
+]
+
+[project.optional-dependencies]
+agent = ["harness-run[local]>=0.4"]
+test = ["pytest", "pytest-asyncio"]
+
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["selfheal*", "sandbox_spider*"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests", "sandbox_spider/fixtures"]

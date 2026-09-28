@@ -1,0 +1,53 @@
+{
+  "categoryName": "Electronics",
+  "items": null,
+  "metadata": {
+    "dateDownloaded": "2026-09-28T19:27:04Z",
+    "validationMessages": null
+  },
+  "nextPage": null,
+  "pageNumber": null,
+  "subCategories": [
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/category/cat_0_sub_0"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/category/cat_0_sub_1"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/category/cat_0_sub_2"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/category/cat_0_sub_3"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/category/cat_0_sub_4"
+    }
+  ],
+  "url": "http://127.0.0.1:8765/sandbox-store/category/cat_0"
+}

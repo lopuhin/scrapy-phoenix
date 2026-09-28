@@ -1,0 +1,29 @@
+{
+  "categoryName": "Running Shoes",
+  "items": [
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/209e6e48-5e24-438e-92a5-93c81db92330"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "http://127.0.0.1:8765/sandbox-store/product/d527189b-db28-45da-8cb9-be7b24444f64"
+    }
+  ],
+  "metadata": {
+    "dateDownloaded": "2026-09-28T19:27:04Z",
+    "validationMessages": null
+  },
+  "nextPage": null,
+  "pageNumber": 4,
+  "subCategories": null,
+  "url": "http://127.0.0.1:8765/sandbox-store/category/cat_1_sub_2?page=4"
+}

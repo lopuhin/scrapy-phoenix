@@ -24,8 +24,10 @@ Settings: ``SELFHEAL_ENABLED``, ``SELFHEAL_MODEL`` (``gpt-6.1-sol``),
 
 from __future__ import annotations
 
+import ast
 import asyncio
 import difflib
+import inspect
 import json
 import logging
 import re
@@ -361,9 +363,12 @@ class Healer:
         held pages. Other spiders, the test site's source, notes and READMEs
         about the project, scripts and earlier repairs' records stay out of
         sight (the spider's own README, its intent, is in its package).
+
+        A spider that builds on another one (shared item checks, variants that
+        subclass the other's) needs that package too, so the project packages
+        the spider's package imports come along.
         """
-        package = self.spider.variants_package.split(".")[0]
-        keep = (f"{package}/", "selfheal/")
+        keep = tuple(f"{p}/" for p in self._packages()) + ("selfheal/",)
         root = Path(tempfile.mkdtemp(prefix=f"selfheal-{repair.id}-")) / "project"
         for rel in tracked_files(ROOT):
             if not (rel.startswith(keep) or rel in _PROJECT_FILES):
@@ -387,15 +392,42 @@ class Healer:
         repair.metrics["workspace_files"] = len(tracked_files(root))
         return root
 
+    def _packages(self) -> list[str]:
+        """The spider's top-level package and the project packages it imports."""
+        own = self.spider.variants_package.split(".")[0]
+        found = {own}
+        for path in (ROOT / own).rglob("*.py"):
+            for node in ast.walk(ast.parse(path.read_text())):
+                names = ([a.name for a in node.names] if isinstance(node, ast.Import) else
+                         [node.module] if isinstance(node, ast.ImportFrom) and node.module
+                         and not node.level else [])
+                for name in names:
+                    top = name.split(".")[0]
+                    if top != "selfheal" and (ROOT / top / "__init__.py").exists():
+                        found.add(top)
+        return sorted(found)
+
+    def _intent_files(self) -> tuple[str, str]:
+        """README (intent) and items module (checks), as workspace paths.
+
+        The items module is where the spider's item checks are defined; the
+        README is the spider's own, or else the one next to its items module.
+        """
+        check = next(iter(self.spider.item_checks.values()))
+        items = Path(inspect.getfile(check)).resolve().relative_to(ROOT)
+        own = ROOT / self.spider.variants_package.split(".")[0] / "README.md"
+        readme = own.relative_to(ROOT) if own.exists() else items.parent / "README.md"
+        return str(readme), str(items)
+
     def _prompt(self, repair: Repair, module: str, gate_cmd: str) -> str:
         package = self.spider.variants_package
-        pkg_root = package.split(".")[0]
+        readme, items = self._intent_files()
         evidence = json.loads(sorted((repair.dir / "held").glob("*.json"))[0].read_text())
         return PROMPT.format(
             spider=self.spider.name,
             n_held=len(repair.held),
-            readme=f"{pkg_root}/README.md",
-            items=f"{pkg_root}/items.py",
+            readme=readme,
+            items=items,
             item_type=get_fq_class_name(repair.item_cls),
             held=".selfheal/held",
             evidence=evidence["evidence"],

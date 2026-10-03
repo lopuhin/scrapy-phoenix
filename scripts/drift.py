@@ -41,6 +41,15 @@ PRESETS: dict[str, dict[str, str]] = {
         "AB_TEST_LAYOUT": "layout_modern",
         "AB_TEST_RATIO": "0.5",
     },
+    # Infinite-scroll listings with modern product pages. For sandbox_scroll
+    # (built on infinite-scroll) only products change; for sandbox_modern
+    # (built on modern) only listings do: Cases A and B for the other spiders.
+    "scroll-modern": {
+        "ACTIVE_LAYOUT": "layout_infinite_scroll",
+        "AB_TEST_TARGET": "products",
+        "AB_TEST_LAYOUT": "layout_modern",
+        "AB_TEST_RATIO": "1.0",
+    },
     # Case B: listings lose pagination links; products unchanged.
     "infinite-scroll": {"ACTIVE_LAYOUT": "layout_infinite_scroll", "AB_TEST_RATIO": "0.0"},
     "load-more": {"ACTIVE_LAYOUT": "layout_load_more", "AB_TEST_RATIO": "0.0"},

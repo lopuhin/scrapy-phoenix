@@ -14,7 +14,8 @@ class SandboxModernSpider(SelfHealingSpider):
     Navigation is explicit: every listing page goes to a navigation variant,
     whose ``subCategories``, ``items`` and ``nextPage`` are followed. The
     current page travels along ``nextPage`` as ``previous`` so the next page
-    can be checked for progress (see ``selfheal.dispatch.check_progress``).
+    can be checked for progress (see ``selfheal.dispatch.check_progress``),
+    and ``nextPage`` requests skip the dupefilter so that check sees them.
     """
 
     name = "sandbox_modern"
@@ -41,8 +42,11 @@ class SandboxModernSpider(SelfHealingSpider):
         for request in nav.items or []:
             yield response.follow(request.url, self.parse_product)
         if nav.nextPage:
+            # Not deduplicated: a next link pointing back to a page we've seen
+            # must reach check_progress and be refused, not vanish silently.
             yield response.follow(
-                nav.nextPage.url, self.parse_navigation, cb_kwargs={"previous": nav}
+                nav.nextPage.url, self.parse_navigation, cb_kwargs={"previous": nav},
+                dont_filter=True,
             )
 
     async def parse_product(self, response: Response):

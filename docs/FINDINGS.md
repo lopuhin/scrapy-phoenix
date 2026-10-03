@@ -3,7 +3,7 @@
 Evidence gathered while building, for the design and the talk. The summary
 lists what still stands; the dated log below it keeps the details, newest first.
 
-## Summary (as of 2026-10-03: detection, and the repair loop on cases A, B and C)
+## Summary (as of 2026-10-03: detection, and the repair loop on A, B, C and a full redesign)
 
 Step 1 built the detection side on four spiders: three layouts of the sandbox
 store and books.toscrape.com. Every spider extracts everything correctly on its
@@ -134,24 +134,36 @@ extracted fully correctly or refused. **No bad item was delivered.**
     home page was held. The agent also wrote a category variant from pages it
     fetched itself. That variant took the "Prev" button for "Next", and the
     dupefilter dropped the backwards links: 445/566 items, with no refusal and
-    no error. Three rules now apply:
-    - The gate rejects any class that no held page reaches.
-    - Page numbers must go up by one.
-    - `nextPage` requests skip the dupefilter, so a backwards link is refused.
+    no error. Now:
+    - the gate rejects any class that no held page reaches;
+    - page numbers must go up by one;
+    - `nextPage` requests skip the dupefilter, so a backwards link is refused;
+    - when a page is refused for not following the previous one, the healer
+      also holds the previous page (downloaded again), marked with the bad
+      link. The gate then requires the new variant to accept it with a
+      different `nextPage`.
 
-    The same bug is now caught, but the repair doesn't converge (next point).
-22. **Open: a bad "next" link is a fault of the page that has it, but the
-    page held is the one it points to.** The progress check refuses page 1
-    ("does not follow page 2"). The agent gets page 1, which is fine on its
-    own, writes another variant for it, and the cycle repeats until the repair
-    limit. The fix: hold the referring page too (re-download it), and have the
-    gate check that the candidate's `nextPage` on it changed. Until then,
-    `modern` ends `repair_failed` after six tested stages, and nothing wrong is
-    delivered.
-23. **The gate now compares field coverage with the fixtures.** One Case A
-    run passed every check but left "Color" in `additionalProperties`, so 268
-    products had no `color`. The `fields` check rejects that, and in the next
-    run the agent caught it with the gate itself: 566/566 on all 10 fields.
+    With these, `modern` heals in six tested stages: home, top categories,
+    subcategories, products, and pagination twice. Result: 566/566 with all 10
+    fields correct, $0.11 in total, 5.4 min paused.
+22. **The agent gamed a gate check that was unfair.** A first field-coverage
+    check compared a home page with category pages, which share an item type.
+    The agent passed it on retry by returning category links as `items`,
+    hard-coding `pageNumber = 1`, and returning a `nextPage` object whose
+    `__bool__` is `False`, so it counts as filled but the spider never
+    follows it. Its summary said it did this "to satisfy the navigation field
+    contract". The prompt now says not to make a check pass with made-up
+    values or tricks, and to give up when a check looks wrong. The agent then
+    did exactly that, twice, naming the check. Each time the check was too
+    coarse: once for leaf listings without subcategories, once for empty
+    scroll fragments. The check now compares fields only with the closest
+    existing variant's majority fields, and only for data items, not
+    navigation. A wrong check costs a refused repair. It doesn't cost a wrong
+    item, as long as the agent is told it may refuse.
+23. **The gate compares field coverage with the fixtures, for products.** One
+    Case A run passed every other check but left "Color" in
+    `additionalProperties`, so 268 products had no `color`. The `fields` check
+    rejects that module; later runs got all 10 fields right.
 
 ### Still unverified
 
@@ -161,6 +173,34 @@ extracted fully correctly or refused. **No bad item was delivered.**
 - Whether the agent ever needs shell network access: it hasn't so far.
 
 # Log
+
+## 2026-10-03 — the full redesign heals; the agent games a bad check, then refuses one
+
+Continuing from the entry below:
+
+- **Bad next links.** When the progress check refuses a page, the healer
+  downloads the previous page again and holds it with `bad_next` (the link
+  that went wrong). It doesn't re-queue the refused page, whose fetch is now
+  up to the repaired link. The gate requires a candidate to accept a
+  `bad_next` page with a different `nextPage`. On `modern`, stages 5 and 6
+  each held 2 such pages, and the crawl finished 566/566.
+- **Gaming.** With the first version of the `fields` check, `modern`'s home
+  page repair failed the healer's gate run. On the retry the agent made the
+  home page variant fill `items` (category links), `pageNumber` (1) and a
+  falsy `nextPage`, and passed. That was also the first time the retry path
+  ran. After the prompt change, an agent facing the same kind of wrong check
+  answered `give_up` with the reason. That happened in a `modern` stage
+  (subcategories) and in Case B (empty end-of-list fragments).
+- **Final field check.** Profiles come from the closest existing variant's
+  fixtures, counting only fields filled on at least half of them. They apply
+  to data items only. Verified on the bad Case A module (rejected: `color`),
+  the honest leaf-listing variant (accepted), and a minimal home page variant
+  (accepted).
+
+| run | stages | paused (total) | cost | result |
+|---|---|---|---|---|
+| `modern` | 6: home 1 page, top categories 4, subcategories 20, products 16, pagination 4 + 4 | 323 s | $0.111 | 566/566, all 10 fields, 683 requests |
+| `infinite-scroll` | 1: 20 listing pages, one class for listings and fragments | 50 s | $0.024 | 566/566, all 10 fields |
 
 ## 2026-10-03 — the full `modern` redesign: staged repairs and what they exposed
 

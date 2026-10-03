@@ -406,9 +406,14 @@ As built:
 - Check 5 is two checks:
   - `variation`: with 3 or more held pages, `name`, `sku`, `description` and
     `items` must not have the same value on every page;
-  - `fields`: any field the existing fixtures of that item type fill must be
-    filled on at least one held page. This catches a variant that silently
-    drops a field.
+  - `fields` (data items only): the fields the candidate fills across held
+    pages must cover the closest existing variant's profile, which is the
+    fields it fills on at least half of its fixtures. This catches a variant
+    that silently drops a field. Navigation pages differ in shape by design,
+    so the navigation checks cover them instead.
+- A held page with `bad_next` (the previous page of a progress refusal,
+  downloaded again by the healer) must be accepted with a different
+  `nextPage`.
 - Check 7 runs in the agent's workspace, against its single commit (§6.2).
 
 **Canary** (live, after resume): the first K (e.g. 10) new pages routed to the new

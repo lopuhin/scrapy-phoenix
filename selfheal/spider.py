@@ -53,7 +53,7 @@ class SelfHealingSpider(scrapy.Spider):
                 self.logger.warning(str(exc))
             else:
                 self.logger.debug(str(exc))
-            await self.on_unrecognized(exc, response)
+            await self.on_unrecognized(exc, response, previous)
             return None
         stats.inc_value(f"selfheal/variant/{result.variant.__qualname__}")
         return result.item
@@ -65,9 +65,11 @@ class SelfHealingSpider(scrapy.Spider):
             stats = dict(self.crawler.stats.get_stats(), finish_reason=reason)
             Path(path).write_text(json.dumps(stats, default=str, indent=1, sort_keys=True))
 
-    async def on_unrecognized(self, exc: Unrecognized, response: Response) -> None:
+    async def on_unrecognized(
+        self, exc: Unrecognized, response: Response, previous: Any | None = None
+    ) -> None:
         """Hand the page to the healer (``selfheal.healer``) when it is enabled."""
         healer = getattr(self, "healer", None)
         if healer is not None:
-            healer.hold(exc, response)
+            healer.hold(exc, response, previous)
 

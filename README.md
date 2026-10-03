@@ -25,6 +25,8 @@ developed further after the talk.
   - B, listings switch to infinite scroll: 566/566 correct items.
   - C, the price becomes members-only: the agent refuses and the crawl stops
     with `repair_failed`.
+  - The whole site redesigned: six tested repairs in a row (home, categories,
+    listings, products, pagination), 566/566 correct items, 11 cents.
 
 ## Layout
 
@@ -61,6 +63,7 @@ an OpenAI API key for Codex, and `uv` (scrapy-mcp runs through `uvx`):
 python scripts/run_demo.py product-modern --reset    # A: products change layout
 python scripts/run_demo.py no-price --reset          # C: price gone; must refuse
 python scripts/run_demo.py infinite-scroll --reset   # B: listings switch to scrolling
+python scripts/run_demo.py modern --reset            # everything changes
 ```
 
 Each repair is recorded under `repairs/<id>/`: held pages, prompt, agent

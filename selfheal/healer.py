@@ -89,6 +89,10 @@ Item type: `{item_type}`. Held pages (body + JSON with URL and evidence) are in
 {evidence}
 ```
 
+A held page whose JSON has `bad_next` is a page whose `nextPage` led
+somewhere wrong (its evidence says why). Your variant must accept that page and
+give it a different `nextPage` (or none, if it is the last page).
+
 ## How variants work here
 
 - Page objects live in `{variants_dir}/`, one module per site layout. Read the
@@ -122,6 +126,11 @@ Item type: `{item_type}`. Held pages (body + JSON with URL and evidence) are in
 3. Look at the extracted items yourself too: are they *right*, per the README?
    Passing checks is necessary, not sufficient.
 
+Never make a check pass with values that aren't on the page, with placeholder
+values, or with tricks (e.g. objects that pretend to be empty). If a check
+looks wrong for these pages, don't work around it: answer `give_up` and say why
+in `evidence`. A refused repair is fine; a wrong item is not.
+
 The live crawl is reachable through the scrapy-mcp tools (`job_id`: `{job_id}`).
 You may inspect it and fetch pages through it (e.g. `await
 crawler.engine.download_async(Request(url))`), but do not change its state: the
@@ -150,6 +159,8 @@ class Repair:
     trigger: dict[str, Any] = field(default_factory=dict)
     task: asyncio.Task | None = None
     installed: Path | None = None  # the module copied into the live tree
+    # page whose nextPage went wrong → (target URL, error, target request, exc)
+    referrers: dict[str, tuple] = field(default_factory=dict)
     metrics: dict[str, Any] = field(default_factory=dict)
 
 
@@ -185,8 +196,15 @@ class Healer:
 
     # -- hold ---------------------------------------------------------------------
 
-    def hold(self, exc: Unrecognized, response: Response) -> None:
-        """Keep a refused page for the repair; pause and start one if none is running."""
+    def hold(self, exc: Unrecognized, response: Response, previous: Any | None = None) -> None:
+        """Keep a refused page for the repair; pause and start one if none is running.
+
+        When the page was refused for not following ``previous`` (a progress
+        refusal), the fault is in the previous page's ``nextPage``: that page
+        is held too (downloaded again when the repair starts), and this one is
+        not re-queued, since a repaired ``nextPage`` decides whether it is
+        fetched at all.
+        """
         if self.failed:
             return
         request = response.request
@@ -197,7 +215,12 @@ class Healer:
                 self._fail(None, "repair limit reached")
                 return
             repair = self._start(exc, response)
-        repair.held.append(request)
+        progress = next((r for r in exc.refusals if r.stage == "progress"), None)
+        referrer = str(getattr(previous, "url", "") or "") if progress else ""
+        if referrer:
+            repair.referrers.setdefault(referrer, (response.url, progress.error, request, exc))
+        else:
+            repair.held.append(request)
         self.crawler.stats.inc_value("selfheal/held")
         item_type = get_fq_class_name(exc.item_cls)
         if repair.saved < self.max_held_pages:
@@ -235,6 +258,7 @@ class Healer:
         m["trigger"] = repair.trigger
         try:
             await self._drain()
+            await self._hold_referrers(repair)
             module = self._next_module(repair.item_cls)
             module_file = module.replace(".", "/") + ".py"
             workspace = self._workspace(repair)
@@ -280,6 +304,21 @@ class Healer:
         except Exception as exc:
             logger.exception("selfheal: repair %s crashed", repair.id)
             self._fail(repair, f"healer error: {exc!r}")
+
+    async def _hold_referrers(self, repair: Repair) -> None:
+        """Download and hold each page whose ``nextPage`` led to a refused page."""
+        for url, (target, error, request, exc) in repair.referrers.items():
+            response = await self.crawler.engine.download_async(Request(url, dont_filter=True))
+            headers = {k.decode(): [v.decode() for v in vs]
+                       for k, vs in response.headers.items()}
+            evidence = (f"this page's nextPage ({target}) was refused: {error}\n"
+                        f"(as {exc.item_cls.__name__}; the held page there shows it)")
+            save_held(repair.dir / "held", repair.saved, response.url, response.status,
+                      headers, response.body, get_fq_class_name(exc.item_cls), evidence,
+                      bad_next=target)
+            repair.saved += 1
+            repair.held.append(request.replace(url=url, cb_kwargs={}, dont_filter=True))
+            self.crawler.stats.inc_value("selfheal/held_referrers")
 
     async def _drain(self, timeout: float = 30) -> None:
         """Let responses already in flight reach their callbacks (more held pages)."""

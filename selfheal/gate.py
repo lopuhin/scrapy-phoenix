@@ -26,6 +26,7 @@ from pathlib import Path
 from typing import Any
 
 from web_poet import HttpResponse, HttpResponseHeaders
+from zyte_common_items import ProductNavigation
 from web_poet.pages import get_item_cls
 from web_poet.testing import Fixture
 from web_poet.utils import get_fq_class_name
@@ -58,11 +59,12 @@ class HeldPage:
     item_type: str
     evidence: str
     response: HttpResponse
+    bad_next: str | None = None  # this page's old nextPage, which went wrong
 
 
 def save_held(
     directory: Path, index: int, url: str, status: int, headers: dict, body: bytes,
-    item_type: str, evidence: str,
+    item_type: str, evidence: str, bad_next: str | None = None,
 ) -> Path:
     """Write one held page as ``NNN.html`` (body) + ``NNN.json`` (the rest)."""
     directory.mkdir(parents=True, exist_ok=True)
@@ -70,6 +72,8 @@ def save_held(
     stem.with_suffix(".html").write_bytes(body)
     info = {"url": url, "status": status, "headers": headers,
             "item_type": item_type, "evidence": evidence}
+    if bad_next:
+        info["bad_next"] = bad_next
     stem.with_suffix(".json").write_text(json.dumps(info, indent=1))
     return stem
 
@@ -85,7 +89,7 @@ def load_held(directory: Path) -> list[HeldPage]:
         response = HttpResponse(url=info["url"], body=body, status=info["status"],
                                 headers=headers)
         pages.append(HeldPage(meta, info["url"], info["item_type"], info["evidence"],
-                              response))
+                              response, info.get("bad_next")))
     return pages
 
 
@@ -169,6 +173,10 @@ def run_held(
         for cls in reversed(candidates):
             item, why = asyncio.run(variants.try_variant(cls, page.response))
             if item is not None:
+                next_page = getattr(item, "nextPage", None)
+                if page.bad_next and next_page and str(next_page.url) == page.bad_next:
+                    refusals.append(f"{cls.__qualname__} still sends nextPage to {page.bad_next}")
+                    continue
                 accepted.append((page, cls, item))
                 break
             refusals += why
@@ -193,31 +201,45 @@ def check_variation(accepted: list[tuple[HeldPage, type, Any]]) -> Check:
 
 def check_fields(accepted: list[tuple[HeldPage, type, Any]], fixtures_dir: Path,
                  item_cls: type) -> Check:
-    """Fields the existing variants fill must be filled by the candidate too.
+    """The candidate must fill the fields some existing variant fills.
 
-    A field that some fixture output of the same item type has must show up on
-    at least one held page. This catches a new variant that silently drops a
-    field (e.g. leaves "Color" in ``additionalProperties`` instead of ``color``).
+    Each existing variant of this item type has a field profile: the fields
+    filled on at least half of its fixtures (a field only some pages have,
+    like subcategories on top-level categories only, is not expected). The
+    fields the candidate fills across the held pages must cover at least one
+    of those profiles. This catches a new
+    variant that silently drops a field (e.g. leaves "Color" in
+    ``additionalProperties`` instead of ``color``), while a home page is
+    compared with the home-page variant, not with category pages that share
+    its item type.
     """
-    known: dict[str, int] = {}
-    total = 0
+    counts: dict[str, dict[str, int]] = {}
+    totals: dict[str, int] = {}
     for path in sorted(fixtures_dir.glob("*/*/output.json")):
-        if get_item_cls(_import_class(path.parent.parent.name)) is not item_cls:
+        owner = path.parent.parent.name
+        if get_item_cls(_import_class(owner)) is not item_cls:
             continue
-        total += 1
+        owner = owner.rpartition(".")[2]
+        totals[owner] = totals.get(owner, 0) + 1
         for name, value in json.loads(path.read_text()).items():
             if value not in (None, [], "", {}):
-                known[name] = known.get(name, 0) + 1
+                counts.setdefault(owner, {})[name] = counts.get(owner, {}).get(name, 0) + 1
+    profiles = {owner: {n for n, c in counts.get(owner, {}).items() if 2 * c >= totals[owner]}
+                for owner in totals}
+    if not profiles:
+        return Check("fields", True, "no existing fixtures of this item type")
     filled = {
         name for _, _, item in accepted
         for name, value in _plain(item).items() if value not in (None, [], "", {})
     }
-    problems = [
-        f"{name} is filled on {n}/{total} existing fixtures but on none of the held pages"
-        for name, n in sorted(known.items()) if name not in filled
+    missing = {owner: sorted(p - filled) for owner, p in profiles.items()}
+    closest = min(missing, key=lambda o: len(missing[o]))
+    ok = not missing[closest]
+    problems = [] if ok else [
+        f"closest existing variant {closest} fills {', '.join(missing[closest])}; "
+        "the candidate fills none of these on any held page"
     ]
-    return Check("fields", not problems, f"{len(known)} fields known from {total} fixtures",
-                 problems)
+    return Check("fields", ok, f"field profile of {closest}", problems)
 
 
 def _plain(value: Any) -> Any:
@@ -288,7 +310,11 @@ def run_gate(args: argparse.Namespace) -> list[Check]:
     checks.append(check_variation(accepted))
     for item_cls in {get_item_cls(c) for c in candidates}:
         mine = [a for a in accepted if get_item_cls(a[1]) is item_cls]
-        if mine:
+        # Navigation pages differ in shape by design (home, listing, scroll
+        # fragment, empty end probe), so no field profile fits them all; their
+        # completeness is guarded by the navigation item check, the progress
+        # check and last-page proofs instead.
+        if mine and not issubclass(item_cls, ProductNavigation):
             checks.append(check_fields(mine, root / pkg_root / "fixtures", item_cls))
 
     if args.save_fixtures and all(c.ok for c in checks):

@@ -1,6 +1,7 @@
 import attrs
 import pytest
 from web_poet import HttpResponse, Returns, WebPage, field
+from zyte_common_items import ProbabilityRequest
 
 from selfheal.dispatch import ItemCheckError, Unrecognized, Variants
 from selfheal.strict import LayoutMismatch, StrictMixin
@@ -108,3 +109,41 @@ async def test_must_text_rejects_empty_element():
     p = ThingV1(response=page("<div class=v1><h1>  </h1></div>"))
     with pytest.raises(LayoutMismatch, match="no text"):
         p.name
+
+
+@attrs.define
+class Nav:
+    items: list | None = None
+
+
+class NavV1(StrictMixin, WebPage, Returns[Nav]):
+    @field
+    def items(self) -> list | None:
+        return [
+            ProbabilityRequest(url=h) for h in self.may(".card a::attr(href)").getall()
+        ] or None
+
+
+def cards(*hrefs: str) -> HttpResponse:
+    return page("".join(f"<div class=card><a href='{h}'>x</a></div>" for h in hrefs))
+
+
+async def test_next_page_repeating_previous_is_refused():
+    v = Variants()
+    v.register(NavV1)
+    first = (await v.extract(Nav, cards("/a", "/b"))).item
+    assert (await v.extract(Nav, cards("/c", "/d"), previous=first)).item
+    assert (await v.extract(Nav, cards(), previous=first)).item == Nav(items=None)
+    with pytest.raises(Unrecognized) as info:
+        await v.extract(Nav, cards("/a", "/b"), previous=first)
+    [refusal] = info.value.refusals
+    assert refusal.stage == "progress" and "repeat" in refusal.error
+
+
+async def test_refusals_rank_the_closest_variant_first(variants):
+    # V1 is the older variant (tried last), but it understood more of this page
+    # (price extracted, name missing) than V2 (nothing extracted).
+    body = "<div class=v1><span class=price>3</span></div>"
+    with pytest.raises(Unrecognized) as info:
+        await variants.extract(Thing, page(body))
+    assert [r.variant for r in info.value.refusals][0] == "ThingV1"

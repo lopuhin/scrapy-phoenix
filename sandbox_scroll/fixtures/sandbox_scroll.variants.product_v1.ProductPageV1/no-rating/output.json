@@ -1,0 +1,70 @@
+{
+  "additionalProperties": [
+    {
+      "name": "Warranty",
+      "value": "1 Year"
+    },
+    {
+      "name": "Condition",
+      "value": "Refurbished"
+    },
+    {
+      "name": "Storages",
+      "value": "64GB, 128GB, 256GB"
+    },
+    {
+      "name": "Colors",
+      "value": "Black, White, Gold"
+    }
+  ],
+  "aggregateRating": null,
+  "availability": "InStock",
+  "brand": {
+    "name": "Canon"
+  },
+  "breadcrumbs": [
+    {
+      "name": "Home",
+      "url": "http://127.0.0.1:8765/sandbox-store/"
+    },
+    {
+      "name": "Electronics",
+      "url": "http://127.0.0.1:8765/sandbox-store/category/cat_0"
+    },
+    {
+      "name": "Smartphones",
+      "url": "http://127.0.0.1:8765/sandbox-store/category/cat_0_sub_0"
+    }
+  ],
+  "canonicalUrl": null,
+  "color": null,
+  "currency": "USD",
+  "currencyRaw": "USD",
+  "description": "Upgrade your tech game with Canon's latest Smartphone. Whether for work or play, the Canon Republican Smartphone delivers stunning visuals and reliable speed. Available now in White.",
+  "descriptionHtml": "<article>\n\n<p>Upgrade your tech game with Canon&#x27;s latest Smartphone. Whether for work or play, the Canon Republican Smartphone delivers stunning visuals and reliable speed. Available now in White.</p>\n\n</article>",
+  "features": null,
+  "gtin": null,
+  "images": [
+    {
+      "url": "https://placehold.co/300x300?text=Canon+Smartphone"
+    }
+  ],
+  "mainImage": {
+    "url": "https://placehold.co/300x300?text=Canon+Smartphone"
+  },
+  "metadata": {
+    "dateDownloaded": "2026-09-28T20:31:19Z",
+    "probability": 1.0,
+    "validationMessages": null
+  },
+  "mpn": null,
+  "name": "Canon Republican Smartphone",
+  "price": "687.14",
+  "productId": "1165e210-9854-4881-918a-9d292f923996",
+  "regularPrice": "812.34",
+  "size": null,
+  "sku": null,
+  "style": null,
+  "url": "http://127.0.0.1:8765/sandbox-store/product/1165e210-9854-4881-918a-9d292f923996",
+  "variants": null
+}

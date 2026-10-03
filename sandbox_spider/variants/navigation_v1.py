@@ -17,10 +17,9 @@ from selfheal.strict import LayoutMismatch, NavigationMismatch, StrictMixin
 class HomePageV1(StrictMixin, ProductNavigationPage):
     @field
     def subCategories(self) -> list[ProbabilityRequest]:
-        self.must(".hero h1")
         return [
             ProbabilityRequest(url=self.response.urljoin(href))
-            for href in self.must(".grid .card a::attr(href)").getall()
+            for href in self.must(".hero ~ .grid .card a::attr(href)").getall()
         ]
 
 
@@ -40,7 +39,6 @@ class CategoryPageV1(StrictMixin, ProductNavigationPage):
 
     @field
     def categoryName(self) -> str:
-        self.must(".breadcrumbs")
         return self.must_text("h1")
 
     @field
@@ -57,7 +55,6 @@ class CategoryPageV1(StrictMixin, ProductNavigationPage):
     @field
     def pageNumber(self) -> int | None:
         if not self.items:
-            self.must(".pagination")  # rendered (empty) even without products
             return None
         return self._pagination()[0]
 

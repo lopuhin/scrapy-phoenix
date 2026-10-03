@@ -1,0 +1,109 @@
+{
+  "categoryName": "Mystery",
+  "items": [
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/the-mysterious-affair-at-styles-hercule-poirot-1_452/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/in-the-woods-dublin-murder-squad-1_433/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/the-silkworm-cormoran-strike-2_280/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/the-exiled_247/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/the-cuckoos-calling-cormoran-strike-1_239/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/extreme-prey-lucas-davenport-26_154/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/career-of-evil-cormoran-strike-3_137/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/the-no-1-ladies-detective-agency-no-1-ladies-detective-agency-1_76/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/the-girl-you-lost_66/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/the-girl-in-the-ice-dci-erika-foster-1_65/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/blood-defense-samantha-brinkman-1_8/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/1st-to-die-womens-murder-club-1_2/index.html"
+    }
+  ],
+  "metadata": {
+    "dateDownloaded": "2026-09-28T20:31:22Z",
+    "validationMessages": null
+  },
+  "nextPage": null,
+  "pageNumber": 2,
+  "subCategories": null,
+  "url": "https://books.toscrape.com/catalogue/category/books/mystery_3/page-2.html"
+}

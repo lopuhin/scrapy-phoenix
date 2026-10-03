@@ -1,7 +1,8 @@
 [project]
-name = "scrapy-self-heal"
+name = "scrapy-phoenix"
 version = "0.0.1"
-description = "Prototype: a Scrapy spider that detects site drift and repairs itself mid-crawl"
+description = "Prototype: a Scrapy spider that notices site drift and repairs itself mid-crawl"
+license = "Apache-2.0"
 requires-python = ">=3.12"
 dependencies = [
     "scrapy>=2.19",
@@ -18,8 +19,8 @@ requires = ["setuptools>=69"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["selfheal*", "sandbox_spider*"]
+include = ["selfheal*", "sandbox_spider*", "sandbox_modern*", "sandbox_scroll*", "books_spider*"]
 
 [tool.pytest.ini_options]
 asyncio_mode = "auto"
-testpaths = ["tests", "sandbox_spider/fixtures"]
+testpaths = ["tests", "sandbox_spider/fixtures", "sandbox_modern/fixtures", "sandbox_scroll/fixtures", "books_spider/fixtures"]

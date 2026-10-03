@@ -23,7 +23,7 @@ from web_poet import HttpResponse, HttpResponseHeaders, ItemPage
 from web_poet.fields import get_fields_dict
 from web_poet.pages import get_item_cls
 
-from .strict import LayoutMismatch
+from .strict import LayoutMismatch, NavigationMismatch
 
 ItemCheck = Callable[[Any], None]
 
@@ -46,6 +46,7 @@ class Refusal:
     field: str | None
     error: str
     selector: str | None = None
+    fields_ok: int = 0  # fields the variant did extract on this page (for ranking)
 
     def __str__(self) -> str:
         where = f"{self.variant}.{self.field}" if self.field else self.variant
@@ -85,6 +86,10 @@ def build_page(cls: type[ItemPage], response: HttpResponse) -> ItemPage:
     return cls(response=response)  # type: ignore[call-arg]
 
 
+# Fields every page object produces from the response alone.
+_TRIVIAL_FIELDS = {"url", "metadata"}
+
+
 def _describe_error(exc: BaseException) -> tuple[str, str | None]:
     selector = exc.selector if isinstance(exc, LayoutMismatch) else None
     if isinstance(exc, LayoutMismatch):
@@ -96,18 +101,57 @@ async def _explain(page: ItemPage, exc: Exception) -> list[Refusal]:
     """Evaluate fields one by one to name every field that fails on this page."""
     variant = type(page).__qualname__
     refusals = []
+    ok = 0
     for name in get_fields_dict(type(page)):
         try:
             value = getattr(page, name)
             if inspect.isawaitable(value):
-                await value
+                value = await value
         except Exception as field_exc:
             error, selector = _describe_error(field_exc)
             refusals.append(Refusal(variant, "extract", name, error, selector))
+        else:
+            ok += name not in _TRIVIAL_FIELDS and value not in (None, [], "")
     if not refusals:  # failed outside any single field (e.g. item construction)
         error, selector = _describe_error(exc)
         refusals.append(Refusal(variant, "extract", None, error, selector))
+    for r in refusals:
+        r.fields_ok = ok
     return refusals
+
+
+def _item_urls(nav: Any) -> set[str]:
+    return {str(r.url) for r in getattr(nav, "items", None) or []}
+
+
+def check_progress(previous: Any, current: Any) -> None:
+    """A next page must list products the previous page did not.
+
+    This is what catches blind pagination (``?page=N+1`` without a link) on a
+    site that ignores the parameter and serves page 1 again (``docs/DESIGN.md``
+    §4.3 case 3). An empty next page is fine: that is how a probe proves the
+    end.
+    """
+    seen, now = _item_urls(previous), _item_urls(current)
+    if now and now <= seen:
+        raise NavigationMismatch(
+            "items", f"all {len(now)} products repeat the previous page"
+        )
+
+
+def _closest_first(refusals: list[Refusal]) -> list[Refusal]:
+    """Order refusals so the variant that got closest comes first.
+
+    "Closest" is the variant that understood most of the page: item-check and
+    progress refusals first (extraction fully worked), then the most fields
+    successfully extracted. That variant is most likely the one written for
+    this page type, so its failures are the most useful evidence.
+    """
+
+    def rank(r: Refusal) -> tuple[int, int]:
+        return (r.stage == "extract", -r.fields_ok)
+
+    return sorted(refusals, key=rank)  # stable within a variant
 
 
 def _natural_key(name: str) -> list[Any]:
@@ -163,9 +207,16 @@ class Variants:
         }
 
     async def try_variant(
-        self, cls: type[ItemPage], response: Response | HttpResponse
+        self,
+        cls: type[ItemPage],
+        response: Response | HttpResponse,
+        previous: Any | None = None,
     ) -> tuple[Any | None, list[Refusal]]:
-        """Run one variant on one page: ``(item, [])`` or ``(None, refusals)``."""
+        """Run one variant on one page: ``(item, [])`` or ``(None, refusals)``.
+
+        ``previous`` is the navigation item of the page that led here through
+        ``nextPage``; see :func:`check_progress`.
+        """
         page = build_page(cls, to_web_poet(response))
         try:
             item = await page.to_item()
@@ -179,18 +230,26 @@ class Variants:
                 fld = exc.field if isinstance(exc, ItemCheckError) else None
                 msg = exc.message if isinstance(exc, ItemCheckError) else repr(exc)
                 return None, [Refusal(cls.__qualname__, "check", fld, msg)]
+        if previous is not None:
+            try:
+                check_progress(previous, item)
+            except NavigationMismatch as exc:
+                return None, [Refusal(cls.__qualname__, "progress", "items", str(exc))]
         return item, []
 
     async def extract(
-        self, item_cls: type, response: Response | HttpResponse
+        self,
+        item_cls: type,
+        response: Response | HttpResponse,
+        previous: Any | None = None,
     ) -> Extracted:
         refusals: list[Refusal] = []
         for cls in reversed(self._variants.get(item_cls, [])):
-            item, why = await self.try_variant(cls, response)
+            item, why = await self.try_variant(cls, response, previous)
             if item is not None:
                 return Extracted(item, cls)
             refusals.extend(why)
-        raise Unrecognized(item_cls, response.url, refusals)
+        raise Unrecognized(item_cls, response.url, _closest_first(refusals))
 
 
 # web-poet builds all field coroutines before awaiting them, so a field raising

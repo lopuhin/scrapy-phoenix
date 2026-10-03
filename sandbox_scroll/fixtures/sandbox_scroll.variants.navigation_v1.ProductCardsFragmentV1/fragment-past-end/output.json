@@ -1,0 +1,12 @@
+{
+  "categoryName": null,
+  "items": null,
+  "metadata": {
+    "dateDownloaded": "2026-09-28T20:31:19Z",
+    "validationMessages": null
+  },
+  "nextPage": null,
+  "pageNumber": 5,
+  "subCategories": null,
+  "url": "http://127.0.0.1:8765/sandbox-store/partials/products?category_id=cat_1_sub_2&page=5"
+}

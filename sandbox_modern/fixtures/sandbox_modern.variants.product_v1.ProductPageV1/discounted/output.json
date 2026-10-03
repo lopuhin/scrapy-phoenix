@@ -1,0 +1,74 @@
+{
+  "additionalProperties": [
+    {
+      "name": "Warranty",
+      "value": "2 Years"
+    },
+    {
+      "name": "Condition",
+      "value": "Refurbished"
+    },
+    {
+      "name": "Storages",
+      "value": "64GB, 128GB, 256GB"
+    },
+    {
+      "name": "Colors",
+      "value": "Black, White, Gold"
+    }
+  ],
+  "aggregateRating": {
+    "bestRating": 5.0,
+    "ratingValue": 4.8,
+    "reviewCount": 173
+  },
+  "availability": "InStock",
+  "brand": {
+    "name": "Samsung"
+  },
+  "breadcrumbs": [
+    {
+      "name": "Dashboard",
+      "url": "http://127.0.0.1:8765/sandbox-store/"
+    },
+    {
+      "name": "Electronics",
+      "url": "http://127.0.0.1:8765/sandbox-store/category/cat_0"
+    },
+    {
+      "name": "Smartphones",
+      "url": "http://127.0.0.1:8765/sandbox-store/category/cat_0_sub_0"
+    }
+  ],
+  "canonicalUrl": null,
+  "color": null,
+  "currency": "USD",
+  "currencyRaw": "USD",
+  "description": "Experience the ultimate performance with the Samsung Better Smartphone. Featuring a sleek Midnight Blue finish and cutting-edge technology, it's designed to keep up with your busy lifestyle. Backed by a 2 Years warranty.",
+  "descriptionHtml": "<article>\n\n<p>Experience the ultimate performance with the Samsung Better Smartphone. Featuring a sleek Midnight Blue finish and cutting-edge technology, it&#x27;s designed to keep up with your busy lifestyle. Backed by a 2 Years warranty.</p>\n\n</article>",
+  "features": null,
+  "gtin": null,
+  "images": [
+    {
+      "url": "https://placehold.co/300x300?text=Samsung+Smartphone"
+    }
+  ],
+  "mainImage": {
+    "url": "https://placehold.co/300x300?text=Samsung+Smartphone"
+  },
+  "metadata": {
+    "dateDownloaded": "2026-09-28T20:31:18Z",
+    "probability": 1.0,
+    "validationMessages": null
+  },
+  "mpn": null,
+  "name": "Samsung Better Smartphone",
+  "price": "347.22",
+  "productId": "07a0ca6e-0822-48f3-ac03-1199972a8469",
+  "regularPrice": "414.34",
+  "size": null,
+  "sku": null,
+  "style": null,
+  "url": "http://127.0.0.1:8765/sandbox-store/product/07a0ca6e-0822-48f3-ac03-1199972a8469",
+  "variants": null
+}

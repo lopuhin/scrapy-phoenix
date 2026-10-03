@@ -1,0 +1,66 @@
+{
+  "additionalProperties": [
+    {
+      "name": "Warranty",
+      "value": "Lifetime Limited"
+    },
+    {
+      "name": "Condition",
+      "value": "Refurbished"
+    }
+  ],
+  "aggregateRating": {
+    "bestRating": 5.0,
+    "ratingValue": 1.6,
+    "reviewCount": 53
+  },
+  "availability": "InStock",
+  "brand": {
+    "name": "Sony"
+  },
+  "breadcrumbs": [
+    {
+      "name": "Home",
+      "url": "http://127.0.0.1:8765/sandbox-store/"
+    },
+    {
+      "name": "Electronics",
+      "url": "http://127.0.0.1:8765/sandbox-store/category/cat_0"
+    },
+    {
+      "name": "Smartphones",
+      "url": "http://127.0.0.1:8765/sandbox-store/category/cat_0_sub_0"
+    }
+  ],
+  "canonicalUrl": null,
+  "color": "Black",
+  "currency": "USD",
+  "currencyRaw": "USD",
+  "description": "The Sony Face Smartphone by Sony defines innovation. In pristine Refurbished condition, this device offers premium features at a competitive price. Perfect for enthusiasts.",
+  "descriptionHtml": "<article>\n\n<p>The Sony Face Smartphone by Sony defines innovation. In pristine Refurbished condition, this device offers premium features at a competitive price. Perfect for enthusiasts.</p>\n\n</article>",
+  "features": null,
+  "gtin": null,
+  "images": [
+    {
+      "url": "https://placehold.co/300x300?text=Sony+Smartphone"
+    }
+  ],
+  "mainImage": {
+    "url": "https://placehold.co/300x300?text=Sony+Smartphone"
+  },
+  "metadata": {
+    "dateDownloaded": "2026-09-28T20:31:19Z",
+    "probability": 1.0,
+    "validationMessages": null
+  },
+  "mpn": null,
+  "name": "Sony Face Smartphone",
+  "price": "565.29",
+  "productId": "bdd640fb-0667-4ad1-9c80-317fa3b1799d",
+  "regularPrice": null,
+  "size": null,
+  "sku": null,
+  "style": null,
+  "url": "http://127.0.0.1:8765/sandbox-store/product/bdd640fb-0667-4ad1-9c80-317fa3b1799d",
+  "variants": null
+}

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Running Shoes - Modern Store</title>
+    <style>
+        :root { --bg: #222; --text: #eee; --accent: #00d2ff; --secondary: #333; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+        /* Sidebar Navigation */
+        aside.sidebar { width: 250px; background: var(--secondary); padding: 2rem; display: flex; flex-direction: column; }
+        aside.sidebar h1 { font-size: 1.2rem; margin-bottom: 2rem; color: var(--accent); }
+        aside.sidebar nav a { display: block; padding: 10px 0; color: #aaa; text-decoration: none; border-bottom: 1px solid #444; }
+        aside.sidebar nav a:hover { color: #fff; padding-left: 5px; transition: 0.3s; }
+
+        /* Main Content */
+        main.content-wrapper { flex: 1; padding: 3rem; overflow-y: auto; }
+
+        /* Links */
+        a { color: var(--accent); text-decoration: none; }
+
+        /* Footer */
+        footer.site-footer { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #444; color: #666; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <h1>MODERN STORE</h1>
+        <nav>
+            <a href="/sandbox-store/">Dashboard</a>
+            <a href="#">Settings</a>
+            <a href="#">Profile</a>
+        </nav>
+    </aside>
+
+    <main class="content-wrapper">
+        
+<div class="nav-path" style="margin-bottom: 2rem; color: #888;">
+    <a href="/sandbox-store/">Dashboard</a> /
+    
+    <a href="/sandbox-store/category/cat_1">Clothing</a> /
+    
+    <span style="color: #eee;">Running Shoes</span>
+</div>
+
+<h1 style="border-bottom: 2px solid #444; padding-bottom: 1rem;">Running Shoes</h1>
+
+<!-- Subcats as tags -->
+
+
+<!-- Different structure: Table layout for products -->
+<div class="inventory-table">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align: left; color: #888;">
+                <th style="padding: 1rem;">Item</th>
+                <th style="padding: 1rem;">Preview</th>
+                <th style="padding: 1rem;">Cost</th>
+                <th style="padding: 1rem;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Adidas Tonight Shoe</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">209e6e48-5e24-438e-92a5-93c81db92330</span>
+                    
+                    <div style="font-size: 0.75rem; color: var(--accent); margin-top: 4px; opacity: 0.8;">
+                        OPTIONS: SIZE, COLOR
+                    </div>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Adidas+Shoe" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    <div class="price-stack">
+                        <div class="current-val" style="font-weight: bold; font-size: 1.2rem;">USD 51.88</div>
+                        <div class="was-val" style="font-size: 0.8rem; color: #777; margin-top: 2px;">WAS: USD 70.48</div>
+                    </div>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/209e6e48-5e24-438e-92a5-93c81db92330">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">H&amp;M Dinner Shoe</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">d527189b-db28-45da-8cb9-be7b24444f64</span>
+                    
+                    <div style="font-size: 0.75rem; color: var(--accent); margin-top: 4px; opacity: 0.8;">
+                        OPTIONS: SIZE, COLOR
+                    </div>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=H&amp;M+Shoe" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    <div class="price-stack">
+                        <div class="current-val" style="font-weight: bold; font-size: 1.2rem;">USD 145.69</div>
+                        <div class="was-val" style="font-size: 0.8rem; color: #777; margin-top: 2px;">WAS: USD 194.04</div>
+                    </div>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/d527189b-db28-45da-8cb9-be7b24444f64">View Specs</a>
+                </td>
+            </tr>
+            
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination as a slider-like control -->
+<div class="control-panel" style="margin-top: 3rem; display: flex; justify-content: center; align-items: center; gap: 1rem;">
+    
+    <button onclick="window.location.href='?page=3'" style="background: transparent; border: 1px solid #666; color: #eee; padding: 5px 10px; cursor: pointer;">&larr;</button>
+    
+
+    <span style="font-family: monospace;">PAGE 4 / 4</span>
+
+    
+</div>
+
+
+        <footer class="site-footer">
+            System Status: Operational | 2026
+        </footer>
+    </main>
+</body>
+</html>

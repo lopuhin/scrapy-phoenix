@@ -1,0 +1,55 @@
+{
+  "additionalProperties": null,
+  "aggregateRating": {
+    "bestRating": 5.0,
+    "ratingValue": 1.0,
+    "reviewCount": null
+  },
+  "availability": "InStock",
+  "brand": null,
+  "breadcrumbs": [
+    {
+      "name": "Home",
+      "url": "https://books.toscrape.com/index.html"
+    },
+    {
+      "name": "Books",
+      "url": "https://books.toscrape.com/catalogue/category/books_1/index.html"
+    },
+    {
+      "name": "Classics",
+      "url": "https://books.toscrape.com/catalogue/category/books/classics_6/index.html"
+    }
+  ],
+  "canonicalUrl": null,
+  "color": null,
+  "currency": "GBP",
+  "currencyRaw": "£",
+  "description": null,
+  "descriptionHtml": null,
+  "features": null,
+  "gtin": null,
+  "images": [
+    {
+      "url": "https://books.toscrape.com/media/cache/99/df/99df494c230127c3d5ff53153d1f23a3.jpg"
+    }
+  ],
+  "mainImage": {
+    "url": "https://books.toscrape.com/media/cache/99/df/99df494c230127c3d5ff53153d1f23a3.jpg"
+  },
+  "metadata": {
+    "dateDownloaded": "2026-09-28T20:31:22Z",
+    "probability": 1.0,
+    "validationMessages": null
+  },
+  "mpn": null,
+  "name": "Alice in Wonderland (Alice's Adventures in Wonderland #1)",
+  "price": "55.53",
+  "productId": null,
+  "regularPrice": null,
+  "size": null,
+  "sku": "cd2a2a70dd5d176d",
+  "style": null,
+  "url": "https://books.toscrape.com/catalogue/alice-in-wonderland-alices-adventures-in-wonderland-1_5/index.html",
+  "variants": null
+}

@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gardening Tools - Modern Store</title>
+    <style>
+        :root { --bg: #222; --text: #eee; --accent: #00d2ff; --secondary: #333; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+        /* Sidebar Navigation */
+        aside.sidebar { width: 250px; background: var(--secondary); padding: 2rem; display: flex; flex-direction: column; }
+        aside.sidebar h1 { font-size: 1.2rem; margin-bottom: 2rem; color: var(--accent); }
+        aside.sidebar nav a { display: block; padding: 10px 0; color: #aaa; text-decoration: none; border-bottom: 1px solid #444; }
+        aside.sidebar nav a:hover { color: #fff; padding-left: 5px; transition: 0.3s; }
+
+        /* Main Content */
+        main.content-wrapper { flex: 1; padding: 3rem; overflow-y: auto; }
+
+        /* Links */
+        a { color: var(--accent); text-decoration: none; }
+
+        /* Footer */
+        footer.site-footer { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #444; color: #666; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <h1>MODERN STORE</h1>
+        <nav>
+            <a href="/sandbox-store/">Dashboard</a>
+            <a href="#">Settings</a>
+            <a href="#">Profile</a>
+        </nav>
+    </aside>
+
+    <main class="content-wrapper">
+        
+<div class="nav-path" style="margin-bottom: 2rem; color: #888;">
+    <a href="/sandbox-store/">Dashboard</a> /
+    
+    <a href="/sandbox-store/category/cat_2">Home &amp; Garden</a> /
+    
+    <span style="color: #eee;">Gardening Tools</span>
+</div>
+
+<h1 style="border-bottom: 2px solid #444; padding-bottom: 1rem;">Gardening Tools</h1>
+
+<!-- Subcats as tags -->
+
+
+<!-- Different structure: Table layout for products -->
+<div class="inventory-table">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align: left; color: #888;">
+                <th style="padding: 1rem;">Item</th>
+                <th style="padding: 1rem;">Preview</th>
+                <th style="padding: 1rem;">Cost</th>
+                <th style="padding: 1rem;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">If Drug Tool</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">d2478bb2-8945-49ec-8850-3e9d7e1b2034</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=If+Tool" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 516.03
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/d2478bb2-8945-49ec-8850-3e9d7e1b2034">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Participant New Tool</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">6bfdc189-b705-40f8-94ba-0d7c1567f88e</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Participant+Tool" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 587.23
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/6bfdc189-b705-40f8-94ba-0d7c1567f88e">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Scientist Discuss Tool</strong>
+                    
+                    <div class="status-indicator offline" style="display: inline-block; width: 10px; height: 10px; background-color: #ff3333; border-radius: 50%; margin-right: 5px;"></div>
+                    <span style="color: #ff3333; font-size: 0.8rem; font-weight: bold;">UNAVAILABLE</span>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">bf8f81ea-cfb0-468d-b189-25a6c6cec51b</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Scientist+Tool" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 778.6
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/bf8f81ea-cfb0-468d-b189-25a6c6cec51b">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Today Democrat Tool</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">00bbd543-5c98-4d57-bc35-9ce2165607c0</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Today+Tool" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 342.18
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/00bbd543-5c98-4d57-bc35-9ce2165607c0">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Will Cell Tool</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">79533cb7-8ef1-4114-9cc6-24ef04643f52</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Will+Tool" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 414.23
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/79533cb7-8ef1-4114-9cc6-24ef04643f52">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Time Herself Tool</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">596ed71c-e94f-43ec-8f40-76a21c33345d</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Time+Tool" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 359.29
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/596ed71c-e94f-43ec-8f40-76a21c33345d">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Financial Chair Tool</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">d1aaab53-c755-46c2-9de4-cd87d96da200</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Financial+Tool" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 566.57
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/d1aaab53-c755-46c2-9de4-cd87d96da200">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Word Ok Tool</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">da72ab37-d5d3-48cf-a4e6-5ffd75dc037d</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Word+Tool" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 755.97
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/da72ab37-d5d3-48cf-a4e6-5ffd75dc037d">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Door Their Tool</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">35f2e254-3e14-4f6a-abcb-b347e9b758ee</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Door+Tool" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    <div class="price-stack">
+                        <div class="current-val" style="font-weight: bold; font-size: 1.2rem;">USD 108.22</div>
+                        <div class="was-val" style="font-size: 0.8rem; color: #777; margin-top: 2px;">WAS: USD 148.21</div>
+                    </div>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/35f2e254-3e14-4f6a-abcb-b347e9b758ee">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Score Safe Tool</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">1e032a65-2346-426d-bf3b-16810e4d364e</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Score+Tool" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 381.41
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/1e032a65-2346-426d-bf3b-16810e4d364e">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Language Safe Tool</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">06beab4a-bbab-4b0e-a0a1-451d24a0aaad</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Language+Tool" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    <div class="price-stack">
+                        <div class="current-val" style="font-weight: bold; font-size: 1.2rem;">USD 171.6</div>
+                        <div class="was-val" style="font-size: 0.8rem; color: #777; margin-top: 2px;">WAS: USD 187.72</div>
+                    </div>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/06beab4a-bbab-4b0e-a0a1-451d24a0aaad">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Party Recognize Tool</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">1b2375d0-b38f-40f2-8dd8-67e55f26b2a6</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Party+Tool" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 329.07
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/1b2375d0-b38f-40f2-8dd8-67e55f26b2a6">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Coach Truth Tool</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">980b82cb-d662-48bf-ba11-4e5612e29c2a</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Coach+Tool" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    <div class="price-stack">
+                        <div class="current-val" style="font-weight: bold; font-size: 1.2rem;">USD 576.04</div>
+                        <div class="was-val" style="font-size: 0.8rem; color: #777; margin-top: 2px;">WAS: USD 686.59</div>
+                    </div>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/980b82cb-d662-48bf-ba11-4e5612e29c2a">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Election Bar Tool</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">242ac30f-5d80-453b-a59a-5d6c07ba408b</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Election+Tool" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 99.49
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/242ac30f-5d80-453b-a59a-5d6c07ba408b">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Keep Teach Tool</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">d4c0df28-91b5-4cb4-8331-bd0d13ba8d24</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Keep+Tool" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    <div class="price-stack">
+                        <div class="current-val" style="font-weight: bold; font-size: 1.2rem;">USD 139.66</div>
+                        <div class="was-val" style="font-size: 0.8rem; color: #777; margin-top: 2px;">WAS: USD 174.54</div>
+                    </div>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/d4c0df28-91b5-4cb4-8331-bd0d13ba8d24">View Specs</a>
+                </td>
+            </tr>
+            
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination as a slider-like control -->
+<div class="control-panel" style="margin-top: 3rem; display: flex; justify-content: center; align-items: center; gap: 1rem;">
+    
+
+    <span style="font-family: monospace;">PAGE 1 / 1</span>
+
+    
+</div>
+
+
+        <footer class="site-footer">
+            System Status: Operational | 2026
+        </footer>
+    </main>
+</body>
+</html>

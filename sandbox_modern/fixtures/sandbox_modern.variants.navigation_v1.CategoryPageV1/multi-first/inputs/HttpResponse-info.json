@@ -1,0 +1,28 @@
+{
+  "_encoding": null,
+  "headers": [
+    [
+      "date",
+      "Mon, 28 Sep 2026 20:31:18 GMT"
+    ],
+    [
+      "server",
+      "uvicorn"
+    ],
+    [
+      "content-length",
+      "19430"
+    ],
+    [
+      "content-type",
+      "text/html; charset=utf-8"
+    ],
+    [
+      "Connection",
+      "close"
+    ]
+  ],
+  "status": 200,
+  "type": "HttpResponse",
+  "url": "http://127.0.0.1:8765/sandbox-store/category/cat_1_sub_2"
+}

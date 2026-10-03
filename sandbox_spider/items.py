@@ -30,5 +30,6 @@ def check_product(item: Product) -> None:
 
 
 def check_navigation(item: ProductNavigation) -> None:
-    if not item.items and not item.subCategories:
+    probed_past_the_end = item.pageNumber is not None and item.pageNumber > 1
+    if not item.items and not item.subCategories and not probed_past_the_end:
         raise ItemCheckError("items", "dead end: no products and no subcategories")

@@ -31,15 +31,19 @@ class SelfHealingSpider(scrapy.Spider):
         self.variants.register_package(self.variants_package)
         self._unrecognized_logged = 0
 
-    async def extract(self, item_cls: type, response: Response) -> Any | None:
+    async def extract(
+        self, item_cls: type, response: Response, previous: Any | None = None
+    ) -> Any | None:
         """Return the item from the first variant that accepts ``response``.
 
         Returns ``None`` when no variant does; the page then yields nothing
-        (never an item from an unrecognised page).
+        (never an item from an unrecognised page). Pass ``previous`` (the
+        navigation item whose ``nextPage`` led here) to check that pagination
+        makes progress.
         """
         stats = self.crawler.stats
         try:
-            result = await self.variants.extract(item_cls, response)
+            result = await self.variants.extract(item_cls, response, previous)
         except Unrecognized as exc:
             stats.inc_value(f"selfheal/unrecognized/{item_cls.__name__}")
             if not stats.get_value("selfheal/first_unrecognized"):
@@ -63,3 +67,4 @@ class SelfHealingSpider(scrapy.Spider):
 
     async def on_unrecognized(self, exc: Unrecognized, response: Response) -> None:
         """Hook for the healer (hold + repair). Phase 0 step 1: nothing."""
+

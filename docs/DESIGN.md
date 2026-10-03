@@ -1,7 +1,16 @@
 # Design: self-modifying spider (phase 0 + phase 1 outline)
 
-Status: draft, second pass after review. Builds on
-`HANDOFF-self-modifying-spider.md`; section numbers like "H§5" refer to the handoff.
+Status: draft, second pass after review.
+
+**Goal.** A Scrapy spider that notices, while running, that the site has drifted
+(new layout, pagination gone, a navigation dead end). It then pauses, runs a
+coding agent *inside the same process* to repair its own code, validates and
+hot-loads the repair, and resumes **the same run**. Fixed intent, mutable
+implementation. The prototype supports a conference talk. Out of scope:
+external monitoring, coordinating parallel jobs, ban handling, hardening
+against prompt injection, and cold start (we assume a human approved a first
+correct run).
+
 Facts marked *(verified)* were confirmed by running code against the installed
 versions; the rest are from reading source.
 
@@ -130,6 +139,10 @@ class ProductPageV1(StrictMixin, ProductPage):
   evidence. Spiders written the usual way still get detection, with worse evidence.
   This is how Scrapy code already fails when a layout changes. We make it deliberate
   and catch it before the item leaves.
+- **Only `must` what you extract with.** An anchor that no extraction uses
+  (e.g. a scroll trigger) only adds false positives on harmless drift. This was
+  found in the breakage matrix (FINDINGS step 1b), and it is a rule for the
+  agent's prompt too.
 - Candidate for a web-poet fork: field-aware errors (the field name gets attached
   automatically), or `@field(required=True)` so that a field returning `None` raises
   without an explicit `must`.
@@ -153,7 +166,8 @@ with extraction.
 Normal page-to-page variation (discount or not, out of stock, no rating, a listing
 with a single page) must pass both gates. The baseline fixtures cover each case on
 purpose (§8). They are the false-positive test set, and where a wrongly placed `must`
-shows up. We use no threshold at first (H§7).
+shows up. We use no threshold at first: the cost of a false positive is one pause and one
+agent run.
 
 ### 4.3 Navigation
 
@@ -187,10 +201,14 @@ How a variant establishes it depends on what the site renders:
    The framework runs the repeat check in dispatch for navigation pages, so every
    variant gets it.
 
+All three cases now have a working spider: `sandbox_store` (case 1),
+`sandbox_modern` and `books` (case 2), and `sandbox_scroll` (case 3, probing).
+See `docs/FINDINGS.md`.
+
 What stays undetectable per page: a site with no widget and no count, whose variant
 neither probes nor proves the last page. That would fail silently. The principle above
 rules it out when a variant is written, and the gate enforces it for new variants.
-Without it, only a comparison with a previous run could catch it (H§7; talk point:
+Without it, only a comparison with a previous run could catch it (talk point:
 this is where in-process detection is weaker than aggregate monitoring).
 
 ### 4.4 Why the spider must be written differently (talk point)
@@ -216,7 +234,7 @@ used for page-object base classes, `HttpResponse`, fixtures and the pytest plugi
 identities and duplicate rules *(verified)*. The agent writes
 `variants/product_v2.py`, and a fix to an existing variant becomes
 `product_v2_1.py`. The healer imports it and appends it to `Variants`. Old variants
-stay: "add, don't overwrite" (H§3), and sites that revert are covered.
+stay: "add, don't overwrite", and sites that revert are covered.
 
 A new variant is tried first, so on old-layout fixtures it must **raise** or produce
 the **same output**. Otherwise it would take over pages the old variants handle and
@@ -370,7 +388,7 @@ out: they are not reliable enough to act as a judge.
 
 **Promotion:** after the gate passes, the held pages + new-variant output are saved as
 web-poet fixtures under `repairs/<id>/fixtures/`. A human promotes them into
-`fixtures/` (later: via a PR, H§6 phase 3). Until then the record marks them
+`fixtures/` (later: via a PR). Until then the record marks them
 unreviewed.
 
 ## 8. Intent and baseline
@@ -390,7 +408,7 @@ unreviewed.
   count per category vs the previous run, the README links a Scrapy Cloud job (a
   local items file in phase 0). This is not needed for phase 0.
 
-## 9. Recording and metrics (H§9)
+## 9. Recording and metrics
 
 `repairs/<ts>-<id>/`: `held/`, `prompt.md`, `events.jsonl` (streamed harness events,
 including scrapy-mcp calls), `proposal.json`, `diff.patch`, `gate.json`, `fixtures/`,
@@ -416,7 +434,7 @@ is to find gaps in the detection model while they are cheap to fix.
    - **books.toscrape.com**: a different site shape. It has single-page categories
      *with no pager* and a next-only pager on others, so it exercises exactly the
      §4.3 cases 1–3. It is used only to test how writing and detection work, not as a
-     breakage target (H§10).
+     breakage target, since we can't control when real sites break.
 3. **Breakage matrix:** each sandbox spider × each sandbox layout, full crawls.
    - Expected: detection fires on the first mismatching page, and never on the
      spider's own layout (the false-positive test).

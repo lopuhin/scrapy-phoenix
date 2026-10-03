@@ -1,6 +1,6 @@
 """Breakage matrix: crawl the sandbox under every layout preset (no healer).
 
-Usage: python scripts/matrix.py [--spider sandbox_store] [presets...]
+Usage: python scripts/matrix.py [--spider NAME ...] [presets...]
 
 For each preset: flip the sandbox, run a full crawl, and report items, how many
 are fully correct against ground truth, which pages were refused, and the first
@@ -23,17 +23,22 @@ OUT = Path("output")
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("presets", nargs="*", default=list(PRESETS))
-    parser.add_argument("--spider", default="sandbox_store")
+    parser.add_argument(
+        "--spider", action="append",
+        help="default: sandbox_store, sandbox_modern, sandbox_scroll",
+    )
     parser.add_argument("--base", default="http://127.0.0.1:8765")
     args = parser.parse_args()
+    spiders = args.spider or ["sandbox_store", "sandbox_modern", "sandbox_scroll"]
     OUT.mkdir(exist_ok=True)
     rows = []
     try:
-        for preset in args.presets:
+        for spider, preset in ((sp, pr) for sp in spiders for pr in args.presets):
             apply(args.base, PRESETS["default"] | PRESETS[preset])
-            items, stats = OUT / f"{preset}.jsonl", OUT / f"{preset}.stats.json"
+            items = OUT / f"{spider}.{preset}.jsonl"
+            stats = OUT / f"{spider}.{preset}.stats.json"
             subprocess.run(
-                [sys.executable, "-m", "scrapy", "crawl", args.spider, "-O", str(items),
+                [sys.executable, "-m", "scrapy", "crawl", spider, "-O", str(items),
                  "-s", f"SELFHEAL_STATS_FILE={stats}", "-s", "LOG_LEVEL=ERROR"],
                 check=True,
             )
@@ -46,15 +51,16 @@ def main() -> None:
             used = {k.rsplit("/", 1)[1]: v for k, v in s.items() if k.startswith("selfheal/variant/")}
             first = (s.get("selfheal/first_unrecognized") or "").splitlines()
             evidence = f"{first[0]} — {first[1].strip()}" if len(first) > 1 else ""
-            rows.append((preset, s.get("item_scraped_count", 0), score, used, refused, evidence))
-            print(f"{preset}: {rows[-1][1:5]}", file=sys.stderr)
+            rows.append((spider, preset, s.get("item_scraped_count", 0),
+                         s.get("downloader/request_count", 0), score, used, refused, evidence))
+            print(f"{spider} {preset}: {rows[-1][2:7]}", file=sys.stderr)
     finally:
         apply(args.base, PRESETS["default"])
-    lines = ["| preset | items | fully correct | variants used | refused | first refusal |",
-             "|---|---|---|---|---|---|"]
-    for preset, n, score, used, refused, evidence in rows:
+    lines = ["| spider | sandbox layout | requests | items | fully correct | variants used | refused | first refusal |",
+             "|---|---|---|---|---|---|---|---|"]
+    for spider, preset, n, reqs, score, used, refused, evidence in rows:
         fmt = lambda d: ", ".join(f"{k} {v}" for k, v in sorted(d.items())) or "—"
-        lines.append(f"| {preset} | {n} | {score} | {fmt(used)} | {fmt(refused)} | {evidence.replace('|', '/')} |")
+        lines.append(f"| {spider} | {preset} | {reqs} | {n} | {score} | {fmt(used)} | {fmt(refused)} | {evidence.replace('|', '/')} |")
     table = "\n".join(lines)
     (OUT / "matrix.md").write_text(table + "\n")
     print(table)

@@ -1,0 +1,55 @@
+{
+  "additionalProperties": null,
+  "aggregateRating": {
+    "bestRating": 5.0,
+    "ratingValue": 3.0,
+    "reviewCount": null
+  },
+  "availability": "InStock",
+  "brand": null,
+  "breadcrumbs": [
+    {
+      "name": "Home",
+      "url": "https://books.toscrape.com/index.html"
+    },
+    {
+      "name": "Books",
+      "url": "https://books.toscrape.com/catalogue/category/books_1/index.html"
+    },
+    {
+      "name": "Poetry",
+      "url": "https://books.toscrape.com/catalogue/category/books/poetry_23/index.html"
+    }
+  ],
+  "canonicalUrl": null,
+  "color": null,
+  "currency": "GBP",
+  "currencyRaw": "£",
+  "description": "It's hard to imagine a world without A Light in the Attic. This now-classic collection of poetry and drawings from Shel Silverstein celebrates its 20th anniversary with this special edition. Silverstein's humorous and creative verse can amuse the dowdiest of readers. Lemon-faced adults and fidgety kids sit still and read these rhythmic words and laugh and smile and love th It's hard to imagine a world without A Light in the Attic. This now-classic collection of poetry and drawings from Shel Silverstein celebrates its 20th anniversary with this special edition. Silverstein's humorous and creative verse can amuse the dowdiest of readers. Lemon-faced adults and fidgety kids sit still and read these rhythmic words and laugh and smile and love that Silverstein. Need proof of his genius? RockabyeRockabye baby, in the treetopDon't you know a treetopIs no safe place to rock?And who put you up there,And your cradle, too?Baby, I think someone down here'sGot it in for you. Shel, you never sounded so good. ...more",
+  "descriptionHtml": "<article>\n\n<p>It&#x27;s hard to imagine a world without A Light in the Attic. This now-classic collection of poetry and drawings from Shel Silverstein celebrates its 20th anniversary with this special edition. Silverstein&#x27;s humorous and creative verse can amuse the dowdiest of readers. Lemon-faced adults and fidgety kids sit still and read these rhythmic words and laugh and smile and love th It&#x27;s hard to imagine a world without A Light in the Attic. This now-classic collection of poetry and drawings from Shel Silverstein celebrates its 20th anniversary with this special edition. Silverstein&#x27;s humorous and creative verse can amuse the dowdiest of readers. Lemon-faced adults and fidgety kids sit still and read these rhythmic words and laugh and smile and love that Silverstein. Need proof of his genius? RockabyeRockabye baby, in the treetopDon&#x27;t you know a treetopIs no safe place to rock?And who put you up there,And your cradle, too?Baby, I think someone down here&#x27;sGot it in for you. Shel, you never sounded so good. ...more</p>\n\n</article>",
+  "features": null,
+  "gtin": null,
+  "images": [
+    {
+      "url": "https://books.toscrape.com/media/cache/fe/72/fe72f0532301ec28892ae79a629a293c.jpg"
+    }
+  ],
+  "mainImage": {
+    "url": "https://books.toscrape.com/media/cache/fe/72/fe72f0532301ec28892ae79a629a293c.jpg"
+  },
+  "metadata": {
+    "dateDownloaded": "2026-09-28T20:31:22Z",
+    "probability": 1.0,
+    "validationMessages": null
+  },
+  "mpn": null,
+  "name": "A Light in the Attic",
+  "price": "51.77",
+  "productId": null,
+  "regularPrice": null,
+  "size": null,
+  "sku": "a897fe39b1053632",
+  "style": null,
+  "url": "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html",
+  "variants": null
+}

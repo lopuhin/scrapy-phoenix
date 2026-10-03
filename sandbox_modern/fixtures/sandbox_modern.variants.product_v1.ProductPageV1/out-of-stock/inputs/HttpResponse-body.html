@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spec Sheet: Bose Today Smartphone</title>
+    <style>
+        :root { --bg: #222; --text: #eee; --accent: #00d2ff; --secondary: #333; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+        /* Sidebar Navigation */
+        aside.sidebar { width: 250px; background: var(--secondary); padding: 2rem; display: flex; flex-direction: column; }
+        aside.sidebar h1 { font-size: 1.2rem; margin-bottom: 2rem; color: var(--accent); }
+        aside.sidebar nav a { display: block; padding: 10px 0; color: #aaa; text-decoration: none; border-bottom: 1px solid #444; }
+        aside.sidebar nav a:hover { color: #fff; padding-left: 5px; transition: 0.3s; }
+
+        /* Main Content */
+        main.content-wrapper { flex: 1; padding: 3rem; overflow-y: auto; }
+
+        /* Links */
+        a { color: var(--accent); text-decoration: none; }
+
+        /* Footer */
+        footer.site-footer { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #444; color: #666; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <h1>MODERN STORE</h1>
+        <nav>
+            <a href="/sandbox-store/">Dashboard</a>
+            <a href="#">Settings</a>
+            <a href="#">Profile</a>
+        </nav>
+    </aside>
+
+    <main class="content-wrapper">
+        
+<div class="nav-path" style="margin-bottom: 2rem; color: #888;">
+    <a href="/sandbox-store/">Dashboard</a> /
+    
+    <a href="/sandbox-store/category/cat_0">Electronics</a> /
+    
+    
+    <a href="/sandbox-store/category/cat_0_sub_0">Smartphones</a> /
+    
+    <span>Spec Sheet</span>
+</div>
+
+<div class="spec-sheet" style="display: flex; gap: 4rem; flex-wrap: wrap;">
+    <div class="data-column" style="flex: 2; min-width: 300px;">
+        <h1 style="font-size: 2.5rem; margin-top: 0;">Bose Today Smartphone</h1>
+        <p style="font-size: 1.2rem; line-height: 1.6;">Experience the ultimate performance with the Bose Today Smartphone. Featuring a sleek Black finish and cutting-edge technology, it&#39;s designed to keep up with your busy lifestyle. Backed by a 1 Year warranty.</p>
+
+        <div class="technical-data" style="margin-top: 3rem; background: #333; padding: 2rem; border-radius: 8px;">
+            <div class="metrics-panel" style="display: flex; justify-content: space-between; margin-bottom: 2rem; border-bottom: 1px solid #444; padding-bottom: 1rem;">
+                <div class="metric-score">
+                    <span style="font-size: 2rem; font-weight: bold; color: var(--accent);">2.6</span>
+                    <span style="color: #aaa; font-size: 0.8rem;">/ 5.0</span>
+                </div>
+                <div class="metric-volume">
+                    <span style="color: #eee; font-weight: bold;">34</span>
+                    <span style="color: #aaa; font-size: 0.8rem; text-transform: uppercase;">Verified Signals</span>
+                </div>
+            </div>
+
+            <h3 style="color: #888; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; margin-top: 0;">Technical Attributes</h3>
+            <table style="width: 100%; text-align: left;">
+                
+                <tr>
+                    <td style="padding: 10px 0; color: #aaa; border-bottom: 1px solid #444;">Brand</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #444; font-weight: bold;">Bose</td>
+                </tr>
+                
+                <tr>
+                    <td style="padding: 10px 0; color: #aaa; border-bottom: 1px solid #444;">Color</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #444; font-weight: bold;">Black</td>
+                </tr>
+                
+                <tr>
+                    <td style="padding: 10px 0; color: #aaa; border-bottom: 1px solid #444;">Warranty</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #444; font-weight: bold;">1 Year</td>
+                </tr>
+                
+                <tr>
+                    <td style="padding: 10px 0; color: #aaa; border-bottom: 1px solid #444;">Condition</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #444; font-weight: bold;">New</td>
+                </tr>
+                
+            </table>
+        </div>
+    </div>
+
+    <div class="visual-column" style="flex: 1; min-width: 250px;">
+        <div style="background: #fff; padding: 10px; transform: rotate(2deg);">
+            <img id="main-image" src="https://placehold.co/300x300?text=Bose+Smartphone" style="width: 100%; display: block;">
+        </div>
+
+        <div class="acquisition-panel" style="margin-top: 2rem; text-align: center;">
+            <div id="price-container">
+                
+                <div class="cost-display" style="font-size: 3rem; font-weight: 100; color: var(--accent);">
+                    <span id="price-val">1629.59</span> <span style="font-size: 1rem;">USD</span>
+                </div>
+                <div id="was-price-val" style="display: none; color: #777; font-size: 1.2rem;"></div>
+                
+            </div>
+
+            <div id="availability-section" style="margin-top: 1rem;">
+                
+                <div class="status-indicator offline" style="color: #ff3333; font-family: monospace;">[ STATUS: OFFLINE ]</div>
+                
+            </div>
+
+            
+
+            <button id="buy-btn" style="background: #555; color: #000; border: none; padding: 1rem 2rem; font-weight: bold; font-size: 1.2rem; cursor: not-allowed; width: 100%; margin-top: 1rem;">
+                UNAVAILABLE
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const variantsData = [
+            
+        ];
+
+        const selectors = document.querySelectorAll('.variant-selector');
+        const priceVal = document.getElementById('price-val');
+        const wasPriceVal = document.getElementById('was-price-val');
+        const mainImage = document.getElementById('main-image');
+        const availabilitySection = document.getElementById('availability-section');
+        const buyBtn = document.getElementById('buy-btn');
+
+        if (variantsData.length > 0 && selectors.length > 0) {
+            function updateVariant() {
+                const currentSelection = {};
+                selectors.forEach(sel => {
+                    currentSelection[sel.getAttribute('data-attribute')] = sel.value;
+                });
+
+                const match = variantsData.find(variant => {
+                    for (const [key, value] of Object.entries(currentSelection)) {
+                        if (variant.attributes[key] !== value) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+
+                if (match) {
+                    priceVal.textContent = match.price;
+                    if (match.original_price) {
+                        wasPriceVal.style.display = 'block';
+                        wasPriceVal.textContent = 'PREVIOUSLY: ' + match.original_price;
+                    } else {
+                        wasPriceVal.style.display = 'none';
+                    }
+
+                    if (match.image_url) {
+                        mainImage.src = match.image_url;
+                    }
+
+                    if (match.in_stock) {
+                        availabilitySection.innerHTML = '<div class="status-indicator online" style="color: var(--accent); font-family: monospace;">[ STATUS: ONLINE ]</div>';
+                        buyBtn.style.background = 'var(--accent)';
+                        buyBtn.style.cursor = 'pointer';
+                        buyBtn.textContent = 'ACQUIRE ASSET';
+                        buyBtn.disabled = false;
+                    } else {
+                        availabilitySection.innerHTML = '<div class="status-indicator offline" style="color: #ff3333; font-family: monospace;">[ STATUS: OFFLINE ]</div>';
+                        buyBtn.style.background = '#555';
+                        buyBtn.style.cursor = 'not-allowed';
+                        buyBtn.textContent = 'UNAVAILABLE';
+                        buyBtn.disabled = true;
+                    }
+                } else {
+                    priceVal.textContent = "---";
+                    wasPriceVal.style.display = 'none';
+                    buyBtn.disabled = true;
+                }
+            }
+
+            selectors.forEach(sel => {
+                sel.addEventListener('change', updateVariant);
+            });
+
+            updateVariant();
+        }
+    });
+</script>
+
+
+        <footer class="site-footer">
+            System Status: Operational | 2026
+        </footer>
+    </main>
+</body>
+</html>

@@ -1,0 +1,28 @@
+{
+  "_encoding": null,
+  "headers": [
+    [
+      "date",
+      "Mon, 28 Sep 2026 20:31:18 GMT"
+    ],
+    [
+      "server",
+      "uvicorn"
+    ],
+    [
+      "content-length",
+      "14454"
+    ],
+    [
+      "content-type",
+      "text/html; charset=utf-8"
+    ],
+    [
+      "Connection",
+      "close"
+    ]
+  ],
+  "status": 200,
+  "type": "HttpResponse",
+  "url": "http://127.0.0.1:8765/sandbox-store/product/1165e210-9854-4881-918a-9d292f923996"
+}

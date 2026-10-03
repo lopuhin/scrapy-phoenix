@@ -30,7 +30,8 @@ def expected(truth: dict) -> dict:
         "brand": attrs.pop("Brand", None),
         "color": attrs.pop("Color", None),
         "additionalProperties": attrs or None,
-        "breadcrumbs": ["Home"] + [b["name"] for b in truth["breadcrumbs"]],
+        # the first crumb (the site root) is named differently per layout
+        "breadcrumbs": [b["name"] for b in truth["breadcrumbs"]],
     }
 
 
@@ -47,7 +48,7 @@ def actual(item: dict) -> dict:
         "brand": (item.get("brand") or {}).get("name"),
         "color": item.get("color"),
         "additionalProperties": {p["name"]: p["value"] for p in props} if props else None,
-        "breadcrumbs": [b["name"] for b in item.get("breadcrumbs") or []],
+        "breadcrumbs": [b["name"] for b in item.get("breadcrumbs") or []][1:],
     }
 
 

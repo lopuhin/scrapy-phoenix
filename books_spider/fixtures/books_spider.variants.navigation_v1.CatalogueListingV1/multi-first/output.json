@@ -1,0 +1,179 @@
+{
+  "categoryName": "Mystery",
+  "items": [
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/sharp-objects_997/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/in-a-dark-dark-wood_963/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/the-past-never-ends_942/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/a-murder-in-time_877/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/the-murder-of-roger-ackroyd-hercule-poirot-4_852/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/the-last-mile-amos-decker-2_754/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/that-darkness-gardiner-and-renner-1_743/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/tastes-like-fear-di-marnie-rome-3_742/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/a-time-of-torment-charlie-parker-14_657/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/a-study-in-scarlet-sherlock-holmes-1_656/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/poisonous-max-revere-novels-3_627/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/murder-at-the-42nd-street-library-raymond-ambler-1_624/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/most-wanted_623/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/hide-away-eve-duncan-20_620/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/boar-island-anna-pigeon-19_613/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/the-widow_609/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/playing-with-fire_602/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/what-happened-on-beale-street-secrets-of-the-south-mysteries-2_506/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/the-bachelor-girls-guide-to-murder-herringford-and-watts-mysteries-1_491/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/delivering-the-truth-quaker-midwife-mystery-1_464/index.html"
+    }
+  ],
+  "metadata": {
+    "dateDownloaded": "2026-09-28T20:31:22Z",
+    "validationMessages": null
+  },
+  "nextPage": {
+    "body": null,
+    "headers": null,
+    "method": "GET",
+    "name": null,
+    "url": "https://books.toscrape.com/catalogue/category/books/mystery_3/page-2.html"
+  },
+  "pageNumber": 1,
+  "subCategories": null,
+  "url": "https://books.toscrape.com/catalogue/category/books/mystery_3/index.html"
+}

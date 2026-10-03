@@ -1,0 +1,574 @@
+{
+  "categoryName": "All products",
+  "items": [
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/frankenstein_20/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/forever-rockers-the-rocker-12_19/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/fighting-fate-fighting-6_18/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/emma_17/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/eat-pray-love_16/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/deep-under-walker-security-1_15/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/choosing-our-religion-the-spiritual-lives-of-americas-nones_14/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/charlie-and-the-chocolate-factory-charlie-bucket-1_13/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/charitys-cross-charles-towne-belles-4_12/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/bright-lines_11/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/bridget-joness-diary-bridget-jones-1_10/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/bounty-colorado-mountain-7_9/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/blood-defense-samantha-brinkman-1_8/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/bleach-vol-1-strawberry-and-the-soul-reapers-bleach-1_7/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/beyond-good-and-evil_6/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/alice-in-wonderland-alices-adventures-in-wonderland-1_5/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/ajin-demi-human-volume-1-ajin-demi-human-1_4/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/a-spys-devotion-the-regency-spies-of-london-1_3/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/1st-to-die-womens-murder-club-1_2/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/1000-places-to-see-before-you-die_1/index.html"
+    }
+  ],
+  "metadata": {
+    "dateDownloaded": "2026-09-28T20:31:22Z",
+    "validationMessages": null
+  },
+  "nextPage": null,
+  "pageNumber": 50,
+  "subCategories": [
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/travel_2/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/mystery_3/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/historical-fiction_4/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/sequential-art_5/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/classics_6/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/philosophy_7/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/romance_8/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/womens-fiction_9/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/fiction_10/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/childrens_11/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/religion_12/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/nonfiction_13/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/music_14/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/default_15/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/science-fiction_16/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/sports-and-games_17/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/add-a-comment_18/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/fantasy_19/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/new-adult_20/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/young-adult_21/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/science_22/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/poetry_23/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/paranormal_24/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/art_25/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/psychology_26/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/autobiography_27/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/parenting_28/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/adult-fiction_29/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/humor_30/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/horror_31/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/history_32/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/food-and-drink_33/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/christian-fiction_34/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/business_35/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/biography_36/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/thriller_37/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/contemporary_38/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/spirituality_39/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/academic_40/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/self-help_41/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/historical_42/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/christian_43/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/suspense_44/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/short-stories_45/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/novels_46/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/health_47/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/politics_48/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/cultural_49/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/erotica_50/index.html"
+    },
+    {
+      "body": null,
+      "headers": null,
+      "metadata": null,
+      "method": "GET",
+      "name": null,
+      "url": "https://books.toscrape.com/catalogue/category/books/crime_51/index.html"
+    }
+  ],
+  "url": "https://books.toscrape.com/catalogue/page-50.html"
+}

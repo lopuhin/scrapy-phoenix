@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Running Shoes - Modern Store</title>
+    <style>
+        :root { --bg: #222; --text: #eee; --accent: #00d2ff; --secondary: #333; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+        /* Sidebar Navigation */
+        aside.sidebar { width: 250px; background: var(--secondary); padding: 2rem; display: flex; flex-direction: column; }
+        aside.sidebar h1 { font-size: 1.2rem; margin-bottom: 2rem; color: var(--accent); }
+        aside.sidebar nav a { display: block; padding: 10px 0; color: #aaa; text-decoration: none; border-bottom: 1px solid #444; }
+        aside.sidebar nav a:hover { color: #fff; padding-left: 5px; transition: 0.3s; }
+
+        /* Main Content */
+        main.content-wrapper { flex: 1; padding: 3rem; overflow-y: auto; }
+
+        /* Links */
+        a { color: var(--accent); text-decoration: none; }
+
+        /* Footer */
+        footer.site-footer { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #444; color: #666; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <h1>MODERN STORE</h1>
+        <nav>
+            <a href="/sandbox-store/">Dashboard</a>
+            <a href="#">Settings</a>
+            <a href="#">Profile</a>
+        </nav>
+    </aside>
+
+    <main class="content-wrapper">
+        
+<div class="nav-path" style="margin-bottom: 2rem; color: #888;">
+    <a href="/sandbox-store/">Dashboard</a> /
+    
+    <a href="/sandbox-store/category/cat_1">Clothing</a> /
+    
+    <span style="color: #eee;">Running Shoes</span>
+</div>
+
+<h1 style="border-bottom: 2px solid #444; padding-bottom: 1rem;">Running Shoes</h1>
+
+<!-- Subcats as tags -->
+
+
+<!-- Different structure: Table layout for products -->
+<div class="inventory-table">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align: left; color: #888;">
+                <th style="padding: 1rem;">Item</th>
+                <th style="padding: 1rem;">Preview</th>
+                <th style="padding: 1rem;">Cost</th>
+                <th style="padding: 1rem;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">H&amp;M Name Shoe</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">3bd54863-7974-490b-b5ba-5e93bfc77282</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=H&amp;M+Shoe" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 39.41
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/3bd54863-7974-490b-b5ba-5e93bfc77282">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Nike Management Shoe</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">c1f37837-8d78-4178-8935-a2789645dec1</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Nike+Shoe" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 88.25
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/c1f37837-8d78-4178-8935-a2789645dec1">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Nike Strong Shoe</strong>
+                    
+                    <div class="status-indicator offline" style="display: inline-block; width: 10px; height: 10px; background-color: #ff3333; border-radius: 50%; margin-right: 5px;"></div>
+                    <span style="color: #ff3333; font-size: 0.8rem; font-weight: bold;">UNAVAILABLE</span>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">5735773c-761e-4287-907c-5e53b8f6703b</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Nike+Shoe" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 115.12
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/5735773c-761e-4287-907c-5e53b8f6703b">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">H&amp;M Laugh Shoe</strong>
+                    
+                    <div class="status-indicator offline" style="display: inline-block; width: 10px; height: 10px; background-color: #ff3333; border-radius: 50%; margin-right: 5px;"></div>
+                    <span style="color: #ff3333; font-size: 0.8rem; font-weight: bold;">UNAVAILABLE</span>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">3016b62b-d886-4545-9025-ac1815fbf5dc</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=H&amp;M+Shoe" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 48.3
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/3016b62b-d886-4545-9025-ac1815fbf5dc">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">H&amp;M Determine Shoe</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">6aed979f-b2ac-4768-b122-4f43c5274f35</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=H&amp;M+Shoe" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 175.88
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/6aed979f-b2ac-4768-b122-4f43c5274f35">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Zara All Shoe</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">8ef65ee8-da5a-4bc3-b331-5c49704d628f</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Zara+Shoe" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    <div class="price-stack">
+                        <div class="current-val" style="font-weight: bold; font-size: 1.2rem;">USD 35.04</div>
+                        <div class="was-val" style="font-size: 0.8rem; color: #777; margin-top: 2px;">WAS: USD 36.95</div>
+                    </div>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/8ef65ee8-da5a-4bc3-b331-5c49704d628f">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Nike Career Shoe</strong>
+                    
+                    <div class="status-indicator offline" style="display: inline-block; width: 10px; height: 10px; background-color: #ff3333; border-radius: 50%; margin-right: 5px;"></div>
+                    <span style="color: #ff3333; font-size: 0.8rem; font-weight: bold;">UNAVAILABLE</span>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">dfae1803-93d7-47e7-a392-3df45fec59ac</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Nike+Shoe" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 196.02
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/dfae1803-93d7-47e7-a392-3df45fec59ac">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">H&amp;M Money Shoe</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">027a76dc-bce0-4aef-b17f-a5c04e39f65a</span>
+                    
+                    <div style="font-size: 0.75rem; color: var(--accent); margin-top: 4px; opacity: 0.8;">
+                        OPTIONS: SIZE, COLOR
+                    </div>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=H&amp;M+Shoe" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    <div class="price-stack">
+                        <div class="current-val" style="font-weight: bold; font-size: 1.2rem;">USD 62.0</div>
+                        <div class="was-val" style="font-size: 0.8rem; color: #777; margin-top: 2px;">WAS: USD 72.62</div>
+                    </div>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/027a76dc-bce0-4aef-b17f-a5c04e39f65a">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Nike Us Shoe</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">38772265-102c-41a3-ab40-4598ae11d3c2</span>
+                    
+                    <div style="font-size: 0.75rem; color: var(--accent); margin-top: 4px; opacity: 0.8;">
+                        OPTIONS: SIZE, COLOR
+                    </div>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Nike+Shoe" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    <div class="price-stack">
+                        <div class="current-val" style="font-weight: bold; font-size: 1.2rem;">USD 20.78</div>
+                        <div class="was-val" style="font-size: 0.8rem; color: #777; margin-top: 2px;">WAS: USD 29.23</div>
+                    </div>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/38772265-102c-41a3-ab40-4598ae11d3c2">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Levi&#39;s Simply Shoe</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">6c8de840-ed30-4556-a2a5-3193a6a1cc2b</span>
+                    
+                    <div style="font-size: 0.75rem; color: var(--accent); margin-top: 4px; opacity: 0.8;">
+                        OPTIONS: SIZE, COLOR
+                    </div>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Levi&#39;s+Shoe" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    <div class="price-stack">
+                        <div class="current-val" style="font-weight: bold; font-size: 1.2rem;">USD 61.44</div>
+                        <div class="was-val" style="font-size: 0.8rem; color: #777; margin-top: 2px;">WAS: USD 74.0</div>
+                    </div>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/6c8de840-ed30-4556-a2a5-3193a6a1cc2b">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Nike Sit Shoe</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">5719d3e4-16d1-4768-9c83-90ba1672380e</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Nike+Shoe" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 117.99
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/5719d3e4-16d1-4768-9c83-90ba1672380e">View Specs</a>
+                </td>
+            </tr>
+            
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">Nike Year Shoe</strong>
+                    
+                    <span style="font-size: 0.8rem; color: #777;">be9f44cb-302b-4401-afed-098b979a7368</span>
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="https://placehold.co/300x300?text=Nike+Shoe" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    
+                    USD 194.87
+                    
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/be9f44cb-302b-4401-afed-098b979a7368">View Specs</a>
+                </td>
+            </tr>
+            
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination as a slider-like control -->
+<div class="control-panel" style="margin-top: 3rem; display: flex; justify-content: center; align-items: center; gap: 1rem;">
+    
+    <button onclick="window.location.href='?page=2'" style="background: transparent; border: 1px solid #666; color: #eee; padding: 5px 10px; cursor: pointer;">&larr;</button>
+    
+
+    <span style="font-family: monospace;">PAGE 3 / 4</span>
+
+    
+    <button onclick="window.location.href='?page=4'" style="background: transparent; border: 1px solid #666; color: #eee; padding: 5px 10px; cursor: pointer;">&rarr;</button>
+    
+</div>
+
+
+        <footer class="site-footer">
+            System Status: Operational | 2026
+        </footer>
+    </main>
+</body>
+</html>

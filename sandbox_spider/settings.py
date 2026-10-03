@@ -1,5 +1,10 @@
 BOT_NAME = "sandbox_spider"
-SPIDER_MODULES = ["sandbox_spider.spider"]
+SPIDER_MODULES = [
+    "sandbox_spider.spider",
+    "sandbox_modern.spider",
+    "sandbox_scroll.spider",
+    "books_spider.spider",
+]
 
 # Base URL of a locally running zyte-monitoring-sandbox (see README.md).
 SANDBOX_URL = "http://127.0.0.1:8765/sandbox-store/"

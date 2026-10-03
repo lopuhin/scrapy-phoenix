@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fact Rate Furniture - Sandbox Store</title>
+    <style>
+        /* Simple Reset */
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: #f9f9f9; color: #333; }
+
+        /* Header */
+        header { background: #fff; padding: 1rem 2rem; box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; }
+        header a.logo { font-size: 1.5rem; font-weight: bold; color: #333; text-decoration: none; }
+        nav a { margin-left: 1rem; color: #555; text-decoration: none; }
+        nav a:hover { color: #000; }
+
+        /* Main Container */
+        .container { max-width: 1200px; margin: 2rem auto; padding: 0 1rem; }
+
+        /* Grid System */
+        .grid { display: grid; gap: 2rem; }
+        .grid-3 { grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); }
+        .grid-4 { grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); }
+
+        /* Cards */
+        .card { background: #fff; border: 1px solid #e1e1e1; border-radius: 8px; overflow: hidden; transition: transform 0.2s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .card img { width: 100%; height: 200px; object-fit: cover; }
+        .card-body { padding: 1rem; }
+        .card-title { margin: 0 0 0.5rem; font-size: 1.1rem; }
+        .card-price { color: #e91e63; font-weight: bold; font-size: 1.2rem; }
+        .card a { text-decoration: none; color: inherit; display: block; }
+
+        /* Pagination */
+        .pagination { display: flex; justify-content: center; margin-top: 2rem; gap: 0.5rem; }
+        .pagination a { padding: 0.5rem 1rem; border: 1px solid #ddd; background: #fff; text-decoration: none; color: #333; border-radius: 4px; }
+        .pagination a.active { background: #007bff; color: #fff; border-color: #007bff; }
+        .pagination span { padding: 0.5rem 1rem; color: #777; }
+
+        /* Breadcrumbs */
+        .breadcrumbs { margin-bottom: 1rem; font-size: 0.9rem; color: #666; }
+        .breadcrumbs a { color: #007bff; text-decoration: none; }
+
+        /* Details */
+        .product-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; background: #fff; padding: 2rem; border-radius: 8px; }
+        .product-info h1 { margin-top: 0; }
+        .price-tag { font-size: 2rem; color: #e91e63; font-weight: bold; margin: 1rem 0; }
+        .btn-buy { background: #007bff; color: white; border: none; padding: 1rem 2rem; font-size: 1.2rem; border-radius: 4px; cursor: pointer; }
+        .attributes { margin-top: 2rem; }
+        .attributes dt { font-weight: bold; margin-top: 0.5rem; }
+        .attributes dd { margin: 0; color: #555; }
+
+        footer { text-align: center; padding: 2rem; color: #777; margin-top: 4rem; border-top: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="/sandbox-store/" class="logo">SandboxStore</a>
+        <nav>
+            <a href="/sandbox-store/">Home</a>
+            <a href="#">About</a>
+            <a href="#">Contact</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        
+<div class="breadcrumbs">
+    <a href="/sandbox-store/">Home</a> &gt;
+    
+    <a href="/sandbox-store/category/cat_2">Home &amp; Garden</a> &gt;
+    
+    
+    <a href="/sandbox-store/category/cat_2_sub_0">Furniture</a> &gt;
+    
+    <span>Fact Rate Furniture</span>
+</div>
+
+<div class="product-detail">
+    <div class="product-image">
+        <img id="main-image" src="https://placehold.co/300x300?text=Fact+Furniture" alt="Fact Rate Furniture" style="width: 100%; border-radius: 8px;">
+    </div>
+    <div class="product-info">
+        <h1>Fact Rate Furniture</h1>
+        <div class="price-tag" id="price-display">
+            
+            USD 567.27
+            
+        </div>
+
+        <div id="stock-display" style="margin-bottom: 1rem;">
+            
+            <span class="stock-status in-stock" style="color: green; font-weight: bold;">In Stock</span>
+            
+        </div>
+
+        
+
+        <div class="rating-container" style="margin-bottom: 1rem; display: flex; align-items: center;">
+            <div class="stars-outer" style="display: inline-block; position: relative; font-family: sans-serif; font-size: 1.5rem; color: #ccc; letter-spacing: 2px;" title="4.2 out of 5">
+                <span class="stars-empty">★★★★★</span>
+                <div class="stars-inner" style="position: absolute; top: 0; left: 0; white-space: nowrap; overflow: hidden; width: 84.0%; color: #f8ce0b;">
+                    ★★★★★
+                </div>
+            </div>
+            <div class="rating-text" style="margin-left: 0.5rem; font-weight: bold;">4.2</div>
+            <div class="reviews" style="color: #777; font-size: 0.9rem; margin-left: 0.5rem;">
+                (305 reviews)
+            </div>
+        </div>
+
+        <p>Enhance your home with the Fact Rate Furniture. Its timeless White finish and sturdy construction make it a favorite among interior designers.</p>
+
+        <button id="add-to-cart-btn" class="btn-buy" >
+            Add to Cart
+        </button>
+
+        <div class="attributes">
+            <dl>
+                
+                <dt>Material</dt>
+                <dd>Glass</dd>
+                
+                <dt>Color</dt>
+                <dd>White</dd>
+                
+                <dt>Dimensions</dt>
+                <dd>Large</dd>
+                
+            </dl>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const variantsData = [
+            
+        ];
+
+        const selectors = document.querySelectorAll('.variant-selector');
+        const priceDisplay = document.getElementById('price-display');
+        const stockDisplay = document.getElementById('stock-display');
+        const addToCartBtn = document.getElementById('add-to-cart-btn');
+        const mainImage = document.getElementById('main-image');
+        const currency = "USD";
+
+        if (variantsData.length > 0 && selectors.length > 0) {
+            function updateVariant() {
+                const currentSelection = {};
+                selectors.forEach(sel => {
+                    currentSelection[sel.getAttribute('data-attribute')] = sel.value;
+                });
+
+                const match = variantsData.find(variant => {
+                    for (const [key, value] of Object.entries(currentSelection)) {
+                        if (variant.attributes[key] !== value) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+
+                if (match) {
+                    // Update Price
+                    let priceHtml = '';
+                    if (match.original_price) {
+                        priceHtml = `<span class="original-price" style="text-decoration: line-through; color: #999; font-size: 0.8em; margin-right: 10px;">${currency} ${match.original_price}</span>
+                                     <span class="current-price" style="color: #d9534f;">${currency} ${match.price}</span>`;
+                    } else {
+                        priceHtml = `${currency} ${match.price}`;
+                    }
+                    priceDisplay.innerHTML = priceHtml;
+
+                    // Update Image
+                    if (match.image_url) {
+                        mainImage.src = match.image_url;
+                    }
+
+                    // Update Stock
+                    if (match.in_stock) {
+                        stockDisplay.innerHTML = '<span class="stock-status in-stock" style="color: green; font-weight: bold;">In Stock</span>';
+                        addToCartBtn.disabled = false;
+                        addToCartBtn.style.background = '#007bff';
+                        addToCartBtn.style.cursor = 'pointer';
+                        addToCartBtn.textContent = 'Add to Cart';
+                    } else {
+                        stockDisplay.innerHTML = '<span class="stock-status out-of-stock" style="color: red; font-weight: bold;">Out of Stock</span>';
+                        addToCartBtn.disabled = true;
+                        addToCartBtn.style.background = '#ccc';
+                        addToCartBtn.style.cursor = 'not-allowed';
+                        addToCartBtn.textContent = 'Out of Stock';
+                    }
+                } else {
+                    priceDisplay.textContent = "Unavailable";
+                    stockDisplay.innerHTML = "";
+                    addToCartBtn.disabled = true;
+                }
+            }
+
+            selectors.forEach(sel => {
+                sel.addEventListener('change', updateVariant);
+            });
+
+            updateVariant();
+        }
+    });
+</script>
+
+    </div>
+
+    <footer>
+        <p>&copy; 2026 Zyte Monitoring Sandbox. Fake Data.</p>
+    </footer>
+</body>
+</html>

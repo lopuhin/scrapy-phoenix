@@ -1,0 +1,40 @@
+{
+  "_encoding": null,
+  "headers": [
+    [
+      "Date",
+      "Mon, 28 Sep 2026 20:31:22 GMT"
+    ],
+    [
+      "Content-Type",
+      "text/html"
+    ],
+    [
+      "Content-Length",
+      "9279"
+    ],
+    [
+      "Connection",
+      "close"
+    ],
+    [
+      "Last-Modified",
+      "Wed, 08 Feb 2023 21:02:32 GMT"
+    ],
+    [
+      "ETag",
+      "\"63e40de8-243f\""
+    ],
+    [
+      "Accept-Ranges",
+      "bytes"
+    ],
+    [
+      "Strict-Transport-Security",
+      "max-age=0; includeSubDomains; preload"
+    ]
+  ],
+  "status": 200,
+  "type": "HttpResponse",
+  "url": "https://books.toscrape.com/catalogue/a-light-in-the-attic_1000/index.html"
+}

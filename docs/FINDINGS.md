@@ -3,7 +3,7 @@
 Evidence gathered while building, for the design and the talk. The summary
 lists what still stands; the dated log below it keeps the details, newest first.
 
-## Summary (as of 2026-10-03: detection, and the repair loop on A, B, C and a full redesign)
+## Summary (as of 2026-10-03: detection, the repair loop, and a 27-run batch on Sol 6.1)
 
 Step 1 built the detection side on four spiders: three layouts of the sandbox
 store and books.toscrape.com. Every spider extracts everything correctly on its
@@ -165,6 +165,51 @@ extracted fully correctly or refused. **No bad item was delivered.**
     `additionalProperties`, so 268 products had no `color`. The `fields` check
     rejects that module; later runs got all 10 fields right.
 
+### Sol 6.1, values, more layouts and spiders
+
+24. **On Sol 6.1 (`gpt-6.1-sol`, medium effort) every case behaved as intended
+    in 27 runs out of 27.** Nine cases, three runs each:
+
+    | case | stages | $/run | paused |
+    |---|---|---|---|
+    | A, products redesigned | 1 | 0.12 | 58 s |
+    | A, half the products | 1 | 0.13 | 49 s |
+    | A, and every price up 13% | 1 | 0.15 | 61 s |
+    | B, infinite scroll | 2.7 | 0.36 | 3.1 min |
+    | load-more button | 3 | 0.39 | 2.7 min |
+    | full `modern` redesign | 4 | 0.43 | 3.1 min |
+    | C, price members-only | gives up | 0.06 | 17 s |
+    | second spider (scroll) under product redesign | 1 | 0.13 | 47 s |
+    | second spider (modern) under infinite scroll | 4.7 | 0.55 | 3.9 min |
+
+    Every healing run ended 566/566 with all 10 fields correct; every C run
+    stopped with `repair_failed`. All 55 repairs passed the healer's gate at
+    the first attempt (the agent runs the gate itself first). Costs are as
+    reported by harness-run, which prices cache writes as plain input; the
+    true cost is about 15% higher. The batch cost about $8 in total.
+25. **Prices changing doesn't disturb the loop.** With every price up 13%
+    before the crawl (`PRICE_SCALE`, a new sandbox knob that changes nothing
+    else), Case A heals with all prices matching the new ground truth. Nothing
+    compares held values with fixture values: fixtures are saved HTML with the
+    output extracted from it. A price change during the pause is described in
+    DESIGN §13, not tested.
+26. **The held pages are a sample, and the gate must not assume they are
+    representative.** In one Case A run all 18 held pages were books, which
+    have no brand. The `fields` check wanted `brand` (most fixture products
+    have one), and Sol gave up rather than invent one or relabel the
+    publisher; it was right. A module may now declare
+    `ABSENT_FIELDS = {"brand": "why"}`, which the gate accepts and reports. The
+    variant still extracts brand where a page has it: 566/566 in that run.
+27. **A second spider needed one change: its workspace must include the
+    packages it imports.** `sandbox_scroll` and `sandbox_modern` share item
+    checks and base variants with `sandbox_spider`. The workspace now carries
+    the project packages the spider's package imports (sibling spiders it
+    doesn't import stay hidden), and the prompt finds README and items where
+    the item checks live. Both then healed like the first spider.
+28. **Sol is more decisive than Luna on staged repairs.** The full redesign
+    took 4 stages on Sol (home, top categories, listings, products), against 6
+    on Luna; each stage costs 9–15 cents on Sol, against 1–3 on Luna.
+
 ### Still unverified
 
 - The retry path where the agent fixes its own module after the healer's gate
@@ -173,6 +218,37 @@ extracted fully correctly or refused. **No bad item was delivered.**
 - Whether the agent ever needs shell network access: it hasn't so far.
 
 # Log
+
+## 2026-10-03 — Sol 6.1: values change, load-more, second spider, 27-run batch
+
+Setup: harness-run pinned to main `4028849` (zytedata/harness-run#6, Codex CLI
+0.159.2), model `gpt-6.1-sol`, medium effort. harness-run prices it from
+LiteLLM at $2.00 / $0.10 / $10.00 per 1M input / cached / output tokens, so
+the budget cap works; cache writes ($2.50) are priced as input.
+
+1. **First Case A run: an honest refusal of an unfair check.** All 18 held
+   pages were books; the `fields` check demanded `brand`. Sol's evidence: "GATE
+   FAILED only on the brand field profile … README requests brand only when
+   shown; inventing it or relabeling Publisher would be incorrect." Fixed with
+   `ABSENT_FIELDS` (summary 26). Rerun: 566/566, $0.13, 45 s.
+2. **Values test.** New sandbox knob `PRICE_SCALE` multiplies every generated
+   price without touching the random sequence (ids, names, attributes stay).
+   Preset `product-modern-repriced`: 566/566 against the new prices, first try.
+3. **load-more.** Three stages (listing with button, fragment, empty fragment
+   ending a category), 566/566, $0.41. No code changes needed.
+4. **Second spider.** Preset `scroll-modern` (infinite-scroll listings, modern
+   products) is Case A for `sandbox_scroll` and Case B for `sandbox_modern`.
+   First attempt needed the workspace to include `sandbox_spider`, which both
+   import (summary 27); both spiders also got `dont_filter` on `nextPage`.
+5. **Batch** (`scripts/batch.py`, results in `output/batch/results.jsonl`):
+   one round of 9 cases, checked, then two more. 27/27 as intended, 55/55
+   repairs first-try (summary 24). Long pauses are agent time: healer overhead
+   is under a second per repair.
+
+Note on earlier Luna costs: harness-run's LiteLLM price for `gpt-5.6-luna`
+($0.20 / $0.02 / $1.20) is a fifth of its own fallback table ($1.00 / $0.10 /
+$6.00). The Luna figures above use LiteLLM's; if the fallback is right, they
+are 5× too low.
 
 ## 2026-10-03 — the full redesign heals; the agent games a bad check, then refuses one
 

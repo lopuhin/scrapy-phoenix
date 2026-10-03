@@ -19,14 +19,18 @@ developed further after the talk.
   each layout.
 - Done: the repair loop. The crawl pauses, a Codex agent writes a new variant
   in a clean copy of the spider, a validation gate checks it, it is hot-loaded
-  through Scrapy's Remote Control, and the same run resumes. Three cases on the
-  test store, about a minute and 1–3 cents each:
-  - A, product pages redesigned: 566/566 correct items.
+  through Scrapy's Remote Control, and the same run resumes. On Sol 6.1, 27
+  runs over nine cases (three spiders, five kinds of site change, one with all
+  prices changed too) all ended as intended, for 6–55 cents a run:
+  - A, product pages redesigned: 566/566 correct items, also when every
+    price changed too.
   - B, listings switch to infinite scroll: 566/566 correct items.
   - C, the price becomes members-only: the agent refuses and the crawl stops
     with `repair_failed`.
-  - The whole site redesigned: six tested repairs in a row (home, categories,
-    listings, products, pagination), 566/566 correct items, 11 cents.
+  - The whole site redesigned: four tested repairs in a row (home, categories,
+    listings, products), 566/566 correct items.
+  - Listings with a "Show more" button, and a second spider built for
+    another layout: 566/566 correct items.
 
 ## Layout
 
@@ -64,6 +68,8 @@ python scripts/run_demo.py product-modern --reset    # A: products change layout
 python scripts/run_demo.py no-price --reset          # C: price gone; must refuse
 python scripts/run_demo.py infinite-scroll --reset   # B: listings switch to scrolling
 python scripts/run_demo.py modern --reset            # everything changes
+python scripts/run_demo.py scroll-modern --spider sandbox_modern --reset  # second spider
+python scripts/batch.py -n 1                         # every case once, tallied
 ```
 
 Each repair is recorded under `repairs/<id>/`: held pages, prompt, agent

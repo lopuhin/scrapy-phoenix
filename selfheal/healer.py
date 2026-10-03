@@ -19,7 +19,9 @@ Settings: ``SELFHEAL_ENABLED``, ``SELFHEAL_MODEL`` (``gpt-6.1-sol``),
 ``SELFHEAL_REASONING_EFFORT`` (``medium``), ``SELFHEAL_BUDGET_USD`` (3),
 ``SELFHEAL_MAX_TURNS`` (80), ``SELFHEAL_AGENT_TIMEOUT`` (seconds, 900),
 ``SELFHEAL_MAX_REPAIRS`` (6), ``SELFHEAL_HELD_PAGES`` (20),
-``SELFHEAL_CANARY`` (10), ``SELFHEAL_REPAIRS_DIR`` (``repairs``).
+``SELFHEAL_CANARY`` (10), ``SELFHEAL_REPAIRS_DIR`` (``repairs``),
+``SELFHEAL_PERMISSION_MODE`` (``acceptEdits``; ``bypassPermissions`` where
+the container is the sandbox and Codex's own can't run).
 """
 
 from __future__ import annotations
@@ -186,6 +188,8 @@ class Healer:
         self.max_held_pages = settings.getint("SELFHEAL_HELD_PAGES", 20)
         self.canary_size = settings.getint("SELFHEAL_CANARY", 10)
         self.repairs_dir = ROOT / settings.get("SELFHEAL_REPAIRS_DIR", "repairs")
+        self.permission_mode = settings.get("SELFHEAL_PERMISSION_MODE", "acceptEdits")
+        self.secrets: dict[str, str] = {}
         self.repairs: list[Repair] = []
         self.active: Repair | None = None
         self.failed = False
@@ -200,6 +204,14 @@ class Healer:
     def spider_opened(self, spider) -> None:
         self.spider = spider
         spider.healer = self
+        # On Scrapy Cloud the OpenAI key comes as a spider argument (-a
+        # openai_api_key=...). It goes to harness-run as a per-run secret, which
+        # keeps it out of the agent's shell, and off the spider, which the agent
+        # can inspect through scrapy-mcp. Locally, OPENAI_API_KEY in the
+        # environment is used as before.
+        key = spider.__dict__.pop("openai_api_key", None)
+        if key:
+            self.secrets["OPENAI_API_KEY"] = key
 
     # -- hold ---------------------------------------------------------------------
 
@@ -463,7 +475,7 @@ class Healer:
 
     async def _run_gate(self, repair: Repair, module: str) -> dict:
         """The healer's own gate run, in the live tree, on the module copied there."""
-        rel = repair.dir.relative_to(ROOT)
+        rel = repair.dir.relative_to(ROOT) if repair.dir.is_relative_to(ROOT) else repair.dir
         cmd = self._gate_cmd(module, str(rel)).split()[1:]
         cmd += ["--json", f"{rel}/gate.json", "--save-fixtures", f"{rel}/fixtures"]
         started = time.monotonic()
@@ -653,12 +665,13 @@ class _AgentSession:
             harness="codex",
             model=h.model,
             reasoning_effort=h.reasoning_effort,
-            permission_mode="acceptEdits",
+            permission_mode=h.permission_mode,
             max_turns=h.max_turns,
             max_budget_usd=h.budget_usd,
             output_schema=RepairProposal,
             checkpoint=True,  # the retry continues the same conversation
-            mcp_servers=[McpServer.stdio(
+            mcp_servers=[McpServer.stdio("scrapy", "scrapy-mcp", [])
+                         if shutil.which("scrapy-mcp") else McpServer.stdio(
                 "scrapy", "uvx", ["--from", "scrapy-mcp-official", "scrapy-mcp"])],
             codex_config={"mcp_servers.scrapy.default_tools_approval_mode": "approve"},
         )
@@ -672,7 +685,9 @@ class _AgentSession:
 
     async def turn(self, message: str) -> RepairProposal | None:
         started = time.monotonic()
-        run = self.session.send(message) if self.started else self.session.run(message)
+        secrets = self.healer.secrets or None
+        run = (self.session.send(message, secrets=secrets) if self.started
+               else self.session.run(message, secrets=secrets))
         self.started = True
         try:
             await asyncio.wait_for(self._stream(run), self.healer.agent_timeout)

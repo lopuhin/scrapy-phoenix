@@ -200,6 +200,9 @@ class Variants:
     def for_item(self, item_cls: type) -> list[type[ItemPage]]:
         return list(self._variants.get(item_cls, []))
 
+    def all(self) -> list[type[ItemPage]]:
+        return [cls for classes in self._variants.values() for cls in classes]
+
     def describe(self) -> dict[str, list[str]]:
         return {
             item_cls.__name__: [c.__qualname__ for c in classes]

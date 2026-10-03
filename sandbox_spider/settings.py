@@ -13,3 +13,7 @@ ROBOTSTXT_OBEY = False
 CONCURRENT_REQUESTS = 16
 AUTOTHROTTLE_ENABLED = False
 LOG_LEVEL = "INFO"
+
+# The healer (selfheal.healer) is loaded always but stays off unless
+# SELFHEAL_ENABLED is set, e.g. `scrapy crawl sandbox_store -s SELFHEAL_ENABLED=1`.
+EXTENSIONS = {"selfheal.healer.Healer": 0}

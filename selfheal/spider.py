@@ -66,5 +66,8 @@ class SelfHealingSpider(scrapy.Spider):
             Path(path).write_text(json.dumps(stats, default=str, indent=1, sort_keys=True))
 
     async def on_unrecognized(self, exc: Unrecognized, response: Response) -> None:
-        """Hook for the healer (hold + repair). Phase 0 step 1: nothing."""
+        """Hand the page to the healer (``selfheal.healer``) when it is enabled."""
+        healer = getattr(self, "healer", None)
+        if healer is not None:
+            healer.hold(exc, response)
 

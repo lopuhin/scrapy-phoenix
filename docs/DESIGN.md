@@ -56,11 +56,8 @@ memory, and no out-of-band item injection. The cost is re-downloading tens of pa
 selfheal/                 # the framework — agent may NOT edit
   strict.py               # must()/may(), LayoutMismatch
   dispatch.py             # variant registry + content-based routing
-  healer.py               # hold / pause / repair orchestration / resume
-  agent.py                # harness-run session, prompt, structured output
+  healer.py               # Scrapy extension: hold / pause / agent / hot-load / resume / record
   gate.py                 # validation gate (run in a subprocess)
-  hotload.py              # Remote Control client + loader snippet
-  record.py               # repair record + metrics
 sandbox_spider/           # the case study
   README.md               # intent, in prose: what we want from this site and why
   spider.py               # thin spider: callbacks call dispatch
@@ -254,14 +251,14 @@ The healer applies the patch with a fixed snippet:
 import importlib
 importlib.invalidate_caches()
 m = importlib.import_module("sandbox_spider.variants.product_v2")
-crawler.spider.variants.register("product", m.ProductPageV2)
-print(crawler.spider.variants.describe())
+added = crawler.spider.variants.register_module(m)
+print(json.dumps([c.__qualname__ for c in added]))
 ```
 
 The healer is in-process, so a direct call would work too. We use Remote Control
 because it is the same channel the agent uses to inspect the crawl, it is the hook
 the "beside" mode would use, and it makes code entering the process an auditable
-boundary. `hotload.py` keeps a `DirectLoader` fallback behind the same interface.
+boundary.
 
 **The agent has scrapy-mcp from phase 0.** It runs as a stdio MCP server in the
 `AgentSpec` and finds the job through the Remote Control job file (same host by
@@ -341,27 +338,34 @@ prompt in phase 0; a read-only scrapy-mcp mode is possible hardening.
   `NavigationMismatch` evidence, `README.md`. The existing variants, items and fixtures
   are already in the tree, and the live crawl is reachable via scrapy-mcp. The prompt
   names the check command:
-  `python -m selfheal.gate --candidate sandbox_spider.variants.product_v2 --held repairs/<id>/held/`
+  `python -m selfheal.gate --spider sandbox_store --candidate sandbox_spider.variants.product_v2
+  --held repairs/<id>/held --baseline repairs/<id>/baseline.json`
   (the same gate the healer runs, §7).
 - **Structured output** (pydantic, `extra="forbid"`, all fields required):
-  `RepairProposal{kind: "variant"|"give_up", page_type: "product"|"navigation",
-  module, class_name, summary, confidence: "high"|"medium"|"low", evidence}`.
+  `RepairProposal{kind: "variant"|"give_up", module, class_names, summary,
+  confidence: "high"|"medium"|"low", evidence}`. The healer picks the module name
+  (`<prefix>_v<N+1>`) and the item type, so the agent doesn't choose them.
   `give_up` is how the agent says a repair isn't safe (Case C).
 - **Budget:** `max_budget_usd` and `max_turns`, plus a wall-clock `asyncio.wait_for`
   → `session.interrupt()`, since harness-run has no overall timeout. If the gate
   fails, the agent gets one retry: `session.send()` with the gate output.
-- The engine is deployed once at spider start. `session.run()` is awaited inside the
-  running loop and must not block the reactor. *This is verified first (§10).*
+- One session per repair, deployed lazily, with `checkpoint=True` so the retry
+  continues the same conversation. `session.run()` runs as a task on the crawl's
+  loop and doesn't block it *(verified, §10)*.
 
 ### 6.3 Settings that matter during a pause
 
-- `CLOSESPIDER_TIMEOUT*` keep running on wall-clock time during a repair: disable them
-  or have the healer account for the pause.
-- A `DontCloseSpider` guard in `spider_idle` while a repair is active.
+- `CLOSESPIDER_TIMEOUT*` keep running on wall-clock time during a repair *(verified)*.
+  When one fires mid-repair, the crawl closes normally: the healer cancels the
+  agent, rolls back its files and records the repair as `interrupted`. We count the
+  pause as part of the run's time budget, so set the timeout above the repair
+  budget.
+- No `DontCloseSpider` guard is needed: `spider_idle` isn't sent while paused.
 - `Spider.start()` is still consumed while paused. That is harmless, since it only
   enqueues.
-- Open: scrapy-poet's fingerprinter caches deps per callback. Dedup should be stable
-  across a swap because callback deps don't change, but this is unverified.
+- Dedup is stable across a swap *(verified)*: a Case A run makes exactly the
+  normal crawl's requests plus the held ones, with no duplicate items. scrapy-poet
+  isn't used, so its fingerprinter doesn't come into it.
 
 ## 7. Validation gate
 
@@ -380,9 +384,21 @@ block the crawl. The healer runs it itself and does not trust the agent's claim.
    positively establishes that it is the last page (§4.3).
 7. **Scope:** the diff touches only `variants/`.
 
+As built, checks 3, 4 and 6 are one `coverage` check: each held page goes
+through `Variants.try_variant`, which runs the item checks, and navigation
+variants prove the last page themselves (§4.3). Check 5 is `variation`: with 3
+or more held pages, `name`, `sku`, `description` and `items` must not have the
+same value on every page. Check 7 compares file hashes with a baseline the
+healer takes when the repair starts. The only change allowed is the one new
+module.
+
 **Canary** (live, after resume): the first K (e.g. 10) new pages routed to the new
 variant must pass both gates of §4.2. A failure re-holds the page and triggers a
 second repair, or a stop if the budget is spent.
+As built, a page routed to the new variant has passed both gates by definition.
+So the canary records how many pages the new variant took (`routed`) and
+whether any page of that type was refused after resume (`refused`). A refusal
+holds the page, which starts the next repair on its own.
 
 "Confidence" for stop-vs-continue = all checks pass AND agent confidence ≠ low. No
 scores in phase 0. Independent extractors (e.g. Zyte API automatic extraction) are
@@ -453,6 +469,7 @@ is to find gaps in the detection model while they are cheap to fix.
    - scrapy-mcp works from inside the Codex sandbox (once its tools are approved);
    - `engine.crawl` + `unpause()` resumes.
 5. Healer + gate + hot-load; Case A end to end (full swap, then ratio 0.5 mixed).
+   Done: `scripts/run_demo.py product-modern` / `product-modern-half`.
 6. Case C: add the `no_price` sandbox layout; scripted rejection, report, non-zero
    exit.
 7. Case B (phase 1): `infinite_scroll` drift → navigation repair.

@@ -3,7 +3,7 @@
 Evidence gathered while building, for the design and the talk. The summary
 lists what still stands; the dated log below it keeps the details, newest first.
 
-## Summary (as of 2026-10-03, step 1 and the step-2 spike)
+## Summary (as of 2026-10-03, step 1 and Case A healed)
 
 Step 1 built the detection side on four spiders: three layouts of the sandbox
 store and books.toscrape.com. Every spider extracts everything correctly on its
@@ -93,14 +93,87 @@ extracted fully correctly or refused. **No bad item was delivered.**
     sandbox site works only with `sandbox_workspace_write.network_access`.
     Writes outside the project fail with "Read-only file system".
 
+16. **Case A heals in under a minute, for about 3 cents.** Product pages switch
+    to a new layout mid-crawl. The crawl pauses with 18 pages held. The agent
+    writes `ProductPageV2` and passes the gate on the first try. The module is
+    hot-loaded and the crawl resumes: 566/566 products, every field correct
+    against ground truth. The pause took 48 s and the agent cost $0.026. With
+    half the products in each layout the result is the same: 281 pages go
+    through V1 and 285 through V2.
+17. **The agent wrote the variant from the held pages alone.** It read only
+    the spider's own package and the held pages, never the modern spider's
+    variant for the same layout in this repo. The talk can still say so only
+    because the event log shows it; the prompt doesn't forbid looking.
+18. **A crawl time limit counts the pause.** `CLOSESPIDER_TIMEOUT` fired 20 s
+    into a repair. The crawl closed cleanly, the agent was cancelled with no
+    stray processes, and the repair was recorded as `interrupted`. Re-downloading
+    doesn't disturb duplicate filtering: requests are exactly the normal crawl's
+    627 plus the 18 held pages.
+
 ### Still unverified
 
-- `CLOSESPIDER_*` timeouts during a long pause.
-- Dedup stability after a hot-swap.
-- Whether the agent needs shell network access at all, or whether fetching
-  pages through the crawl via scrapy-mcp is enough.
+- The failure path end to end: give-up, a failing gate after the retry, rollback
+  of a written module (Case C, needs the `no_price` layout).
+- Navigation repairs (Case B) and staged repairs (navigation, then products).
+- Whether the agent ever needs shell network access.
 
 # Log
+
+## 2026-10-03 — Case A end to end: healer, gate, hot-load
+
+Built `selfheal/healer.py` (a Scrapy extension, off unless `SELFHEAL_ENABLED`),
+`selfheal/gate.py` (`python -m selfheal.gate`) and `scripts/run_demo.py`. The
+loop:
+
+1. A refused page is held: saved as body + JSON with its evidence under
+   `repairs/<id>/held/`.
+2. The engine pauses. The healer waits for in-flight responses to drain, since
+   they add more held pages.
+3. The healer takes a file-hash baseline and writes the prompt, then runs a
+   Codex session. The settings are `gpt-5.6-luna`, medium effort,
+   `acceptEdits`, and scrapy-mcp with its tools approved.
+4. The healer runs the gate itself. If it fails, the agent gets one retry with
+   the gate output.
+5. The healer hot-loads the module through Remote Control `/execute`,
+   re-queues the held requests and unpauses.
+
+| run | held | agent | gate | paused | cost | turns | result |
+|---|---|---|---|---|---|---|---|
+| `product-modern` (all products drift) | 18 | 47.8 s | pass, 1st try | 48.7 s | $0.026 | 17 | 566/566 fully correct, all via V2 |
+| `product-modern-half` (A/B 0.5) | 8 | 46.5 s | pass, 1st try | 47.4 s | $0.022 | 13 | 566/566 fully correct, 281 V1 + 285 V2 |
+| `product-modern` + `CLOSESPIDER_TIMEOUT=20` | 17 | cut at 20 s | — | — | — | — | closed `closespider_timeout`, repair `interrupted`, 0 items |
+
+- **Every field of V1 failed, and the evidence says so.** The held page's
+  evidence lists all 14 V1 fields with the selector that matched nothing.
+  `metrics.json` records only the first, which is `description` because of
+  web-poet's field order. This is a full redesign, not a renamed class, and
+  the agent rewrote every selector from the held HTML.
+- **What the agent did.** About 17 commands: list the spider package and held
+  pages, read README/items/`product_v1.py`, the V1 fixtures' outputs, and the
+  held HTML (several `rg`/`sed` passes). Then it wrote `product_v2.py` (118
+  lines in the first run, `must`/`may` throughout), ran the gate (pass), and
+  read `selfheal/gate.py` and `dispatch.py` to check the extracted items with a
+  snippet of its own. It didn't call scrapy-mcp; it had no need to.
+- **The agent did a review beyond the gate on its own.** Its evidence field
+  says it compared the extracted values with the README after the gate passed.
+  The prompt asks for that, and the event log shows it ran a snippet to print
+  the items.
+- **Two runs wrote two different `product_v2.py` modules**, 118 and 130 lines,
+  both fully correct. We keep neither: `run_demo.py --reset` deletes untracked
+  variant modules, so every demo starts broken.
+- **The canary is not much of a test as built.** A page routed to the new
+  variant has passed extraction and the item checks by definition. What it
+  records is `routed` (113 and 57 pages before the poll noticed K=10) and
+  `refused` after resume (0 in both).
+- **Timeout.** `CLOSESPIDER_TIMEOUT` is a plain `call_later` from spider start,
+  so it fires during a pause. The healer's `spider_closed` handler cancels the
+  repair task (the Codex process exits with it), rolls back added files and
+  records `interrupted`. In this run the agent hadn't written its file yet, so
+  rollback had nothing to remove. We keep the behaviour: the pause is part of
+  the run's time budget.
+- **Duplicate filtering.** 645 requests = 627 (normal crawl) + 18 held pages
+  re-downloaded with `dont_filter`, and 566 unique items. Nothing else was
+  re-fetched.
 
 ## 2026-10-03 — step 2 spike: agent inside a paused crawl
 

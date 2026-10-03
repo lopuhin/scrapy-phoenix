@@ -1,0 +1,21 @@
+{% extends "sandbox_store/layout_modern/base.html" %}
+
+{% block title %}Dashboard - Modern Store{% endblock %}
+
+{% block main_body %}
+<div class="dashboard-header">
+    <h2>Category Overview</h2>
+</div>
+
+<div class="category-stream" style="display: flex; flex-direction: column; gap: 1rem;">
+    {% for category in categories %}
+    <div class="stream-item" style="background: #333; padding: 1.5rem; border-left: 4px solid var(--accent); display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <h3 style="margin: 0;">{{ category.name }}</h3>
+            <span style="font-size: 0.8rem; color: #888;">ID: {{ category.id }}</span>
+        </div>
+        <a href="/sandbox-store/category/{{ category.id }}" class="btn-explore" style="background: #444; padding: 0.5rem 1rem; border-radius: 20px;">Explore &rarr;</a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Panel - Zyte Monitoring Sandbox</title>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: #f4f6f9; color: #333; }
+
+        /* Header */
+        header { background: #343a40; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        header h1 { margin: 0; font-size: 1.5rem; font-weight: 500; }
+        header a { color: #adb5bd; text-decoration: none; transition: color 0.2s; font-weight: 500; }
+        header a:hover { color: #fff; }
+
+        .container { max-width: 900px; margin: 2rem auto; padding: 0 1.5rem; }
+
+        h2 { margin-top: 0; margin-bottom: 1.5rem; font-weight: 300; color: #495057; }
+
+        /* Settings Stack */
+        .settings-stack {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        /* Cards */
+        .card { background: #fff; border-radius: 8px; box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,0.075); border: 1px solid rgba(0,0,0,0.125); overflow: hidden; }
+
+        .card-header { padding: 1rem 1.25rem; background-color: rgba(0,0,0,0.03); border-bottom: 1px solid rgba(0,0,0,0.125); font-weight: 600; font-size: 1.1rem; display: flex; align-items: center; }
+
+        .card-body { padding: 1.25rem; }
+
+        /* Card Variants */
+        .card-primary { border-top: 4px solid #007bff; }
+        .card-primary .card-header { color: #007bff; background: #e7f1ff; }
+
+        .card-success { border-top: 4px solid #28a745; }
+        .card-success .card-header { color: #28a745; background: #e8f5e9; }
+
+        .card-warning { border-top: 4px solid #ffc107; }
+        .card-warning .card-header { color: #856404; background: #fff3cd; }
+
+        .card-danger { border-top: 4px solid #dc3545; }
+        .card-danger .card-header { color: #dc3545; background: #f8d7da; }
+
+        /* Form Elements */
+        .form-group { margin-bottom: 1rem; }
+        .form-group:last-child { margin-bottom: 0; }
+
+        label { display: block; margin-bottom: 0.4rem; font-weight: 600; font-size: 0.9rem; color: #495057; }
+
+        input[type="text"], input[type="number"], select {
+            width: 100%; padding: 0.6rem 0.75rem;
+            border: 1px solid #ced4da; border-radius: 4px;
+            font-size: 0.95rem;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        input:focus { border-color: #80bdff; outline: 0; box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); }
+
+        /* Highlight modified inputs */
+        input.modified-input, select.modified-input {
+            border-color: #ffc107;
+            background-color: #fffdf5;
+            border-width: 2px;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            margin-top: 3rem;
+            padding: 1.5rem 0;
+            text-align: center;
+            position: sticky;
+            bottom: 2rem;
+            z-index: 100;
+            background: rgba(244, 246, 249, 0.8);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 50px;
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        button.btn-save {
+            background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+            color: white;
+            border: none;
+            padding: 1rem 4rem;
+            font-size: 1.2rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            font-weight: 600;
+            box-shadow: 0 10px 20px rgba(0,123,255,0.2);
+            letter-spacing: 0.5px;
+        }
+
+        button.btn-save:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 15px 25px rgba(0,123,255,0.3);
+            background: linear-gradient(135deg, #0088ff 0%, #0066cc 100%);
+        }
+
+        button.btn-save:active {
+            transform: translateY(-1px);
+        }
+
+        button.btn-reset {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(108, 117, 125, 0.2);
+        }
+
+        button.btn-reset:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(108, 117, 125, 0.3);
+        }
+
+        .seed-group { display: flex; gap: 1rem; }
+        .seed-group .form-group { flex: 1; }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Sandbox Admin</h1>
+        <a href="/sandbox-store/">Back to Store &rarr;</a>
+    </header>
+
+    <div class="container">
+        <form id="update-form" action="/admin/update" method="POST">
+            <div class="settings-stack">
+
+                <!-- Layout & General -->
+                <div class="card card-primary">
+                    <div class="card-header">
+                        <span>Layout & Pagination</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="ACTIVE_LAYOUT">Active Layout</label>
+                            <select id="ACTIVE_LAYOUT" name="ACTIVE_LAYOUT" class="{% if settings['ACTIVE_LAYOUT'] != defaults['ACTIVE_LAYOUT'] %}modified-input{% endif %}">
+                                {% set options = ["layout_default", "layout_modern", "layout_load_more", "layout_infinite_scroll", "layout_variant_dom_change", "layout_hidden_price"] %}
+                                {% for opt in options %}
+                                <option value="{{ opt }}" {% if settings['ACTIVE_LAYOUT'] == opt %}selected{% endif %}>{{ opt }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="ITEMS_PER_PAGE">Items Per Page</label>
+                            <input type="number" id="ITEMS_PER_PAGE" name="ITEMS_PER_PAGE" value="{{ settings['ITEMS_PER_PAGE'] }}" class="{% if settings['ITEMS_PER_PAGE'] != defaults['ITEMS_PER_PAGE'] %}modified-input{% endif %}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- A/B Testing -->
+                <div class="card card-warning">
+                    <div class="card-header">
+                        <span>A/B Testing</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="AB_TEST_RATIO">A/B Test Ratio (0.0 to 1.0)</label>
+                            <input type="number" step="0.01" min="0" max="1" id="AB_TEST_RATIO" name="AB_TEST_RATIO" value="{{ settings['AB_TEST_RATIO'] }}" class="{% if settings['AB_TEST_RATIO'] != defaults['AB_TEST_RATIO'] %}modified-input{% endif %}">
+                        </div>
+                        <div class="form-group">
+                            <label for="AB_TEST_LAYOUT">Alt Layout (Variant B)</label>
+                            <select id="AB_TEST_LAYOUT" name="AB_TEST_LAYOUT" class="{% if settings['AB_TEST_LAYOUT'] != defaults['AB_TEST_LAYOUT'] %}modified-input{% endif %}">
+                                {% for opt in options %}
+                                <option value="{{ opt }}" {% if settings['AB_TEST_LAYOUT'] == opt %}selected{% endif %}>{{ opt }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="AB_TEST_TARGET">Target (all, products, categories)</label>
+                            <select id="AB_TEST_TARGET" name="AB_TEST_TARGET" class="{% if settings['AB_TEST_TARGET'] != defaults['AB_TEST_TARGET'] %}modified-input{% endif %}">
+                                <option value="all" {% if settings['AB_TEST_TARGET'] == 'all' %}selected{% endif %}>All Requests</option>
+                                <option value="products" {% if settings['AB_TEST_TARGET'] == 'products' %}selected{% endif %}>Products Only</option>
+                                <option value="categories" {% if settings['AB_TEST_TARGET'] == 'categories' %}selected{% endif %}>Categories Only</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="AB_TEST_SEED">A/B Seed</label>
+                            <input type="number" id="AB_TEST_SEED" name="AB_TEST_SEED" value="{{ settings['AB_TEST_SEED'] }}" class="{% if settings['AB_TEST_SEED'] != defaults['AB_TEST_SEED'] %}modified-input{% endif %}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ban Simulation -->
+                <div class="card card-danger">
+                    <div class="card-header">
+                        <span>Ban Simulation</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="BAN_RATIO">Ban Ratio (0.0 to 1.0)</label>
+                            <input type="number" step="0.01" min="0" max="1" id="BAN_RATIO" name="BAN_RATIO" value="{{ settings['BAN_RATIO'] }}" class="{% if settings['BAN_RATIO'] != defaults['BAN_RATIO'] %}modified-input{% endif %}">
+                        </div>
+                        <div class="form-group">
+                            <label for="BAN_STATUS_CODE">HTTP Status Code</label>
+                            <input type="number" id="BAN_STATUS_CODE" name="BAN_STATUS_CODE" value="{{ settings['BAN_STATUS_CODE'] }}" class="{% if settings['BAN_STATUS_CODE'] != defaults['BAN_STATUS_CODE'] %}modified-input{% endif %}">
+                        </div>
+                        <div class="form-group">
+                            <label for="BAN_TARGET">Target</label>
+                            <select id="BAN_TARGET" name="BAN_TARGET" class="{% if settings['BAN_TARGET'] != defaults['BAN_TARGET'] %}modified-input{% endif %}">
+                                <option value="all" {% if settings['BAN_TARGET'] == 'all' %}selected{% endif %}>All Requests</option>
+                                <option value="products" {% if settings['BAN_TARGET'] == 'products' %}selected{% endif %}>Products Only</option>
+                                <option value="categories" {% if settings['BAN_TARGET'] == 'categories' %}selected{% endif %}>Categories Only</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="BAN_SEED">Ban Seed</label>
+                            <input type="number" id="BAN_SEED" name="BAN_SEED" value="{{ settings['BAN_SEED'] }}" class="{% if settings['BAN_SEED'] != defaults['BAN_SEED'] %}modified-input{% endif %}">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Generation -->
+                <div class="card card-success">
+                    <div class="card-header">
+                        <span>Data Generation</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <label for="PRODUCT_COUNT_SCALE">Product Count Scale (0.5 = half, 2.0 = double)</label>
+                            <input type="number" step="0.1" id="PRODUCT_COUNT_SCALE" name="PRODUCT_COUNT_SCALE" value="{{ settings['PRODUCT_COUNT_SCALE'] }}" class="{% if settings['PRODUCT_COUNT_SCALE'] != defaults['PRODUCT_COUNT_SCALE'] %}modified-input{% endif %}">
+                        </div>
+                        <div class="form-group">
+                            <label for="BOOKS_COUNT_SCALE">Books Count Scale (Books only; they have Publisher, no Brand — raises book share, lowers brand coverage)</label>
+                            <input type="number" step="0.1" id="BOOKS_COUNT_SCALE" name="BOOKS_COUNT_SCALE" value="{{ settings['BOOKS_COUNT_SCALE'] }}" class="{% if settings['BOOKS_COUNT_SCALE'] != defaults['BOOKS_COUNT_SCALE'] %}modified-input{% endif %}">
+                        </div>
+                        <div class="form-group">
+                            <label for="DATA_GENERATION_SEED">Global Data Seed</label>
+                            <input type="number" id="DATA_GENERATION_SEED" name="DATA_GENERATION_SEED" value="{{ settings['DATA_GENERATION_SEED'] }}" class="{% if settings['DATA_GENERATION_SEED'] != defaults['DATA_GENERATION_SEED'] %}modified-input{% endif %}">
+                        </div>
+
+                        <hr style="border: 0; border-top: 1px solid #eee; margin: 1.5rem 0;">
+
+                        <div class="seed-group">
+                            <div class="form-group">
+                                <label for="OUT_OF_STOCK_RATIO">Out of Stock Ratio</label>
+                                <input type="number" step="0.01" min="0" max="1" id="OUT_OF_STOCK_RATIO" name="OUT_OF_STOCK_RATIO" value="{{ settings['OUT_OF_STOCK_RATIO'] }}" class="{% if settings['OUT_OF_STOCK_RATIO'] != defaults['OUT_OF_STOCK_RATIO'] %}modified-input{% endif %}">
+                            </div>
+                            <div class="form-group">
+                                <label for="OUT_OF_STOCK_SEED">Seed</label>
+                                <input type="number" id="OUT_OF_STOCK_SEED" name="OUT_OF_STOCK_SEED" value="{{ settings['OUT_OF_STOCK_SEED'] }}" class="{% if settings['OUT_OF_STOCK_SEED'] != defaults['OUT_OF_STOCK_SEED'] %}modified-input{% endif %}">
+                            </div>
+                        </div>
+
+                        <div class="seed-group">
+                            <div class="form-group">
+                                <label for="DISCOUNT_RATIO">Discount Ratio</label>
+                                <input type="number" step="0.01" min="0" max="1" id="DISCOUNT_RATIO" name="DISCOUNT_RATIO" value="{{ settings['DISCOUNT_RATIO'] }}" class="{% if settings['DISCOUNT_RATIO'] != defaults['DISCOUNT_RATIO'] %}modified-input{% endif %}">
+                            </div>
+                            <div class="form-group">
+                                <label for="DISCOUNT_SEED">Seed</label>
+                                <input type="number" id="DISCOUNT_SEED" name="DISCOUNT_SEED" value="{{ settings['DISCOUNT_SEED'] }}" class="{% if settings['DISCOUNT_SEED'] != defaults['DISCOUNT_SEED'] %}modified-input{% endif %}">
+                            </div>
+                        </div>
+
+                        <div class="seed-group">
+                            <div class="form-group">
+                                <label for="HAS_RATING_RATIO">Has Rating Ratio</label>
+                                <input type="number" step="0.01" min="0" max="1" id="HAS_RATING_RATIO" name="HAS_RATING_RATIO" value="{{ settings['HAS_RATING_RATIO'] }}" class="{% if settings['HAS_RATING_RATIO'] != defaults['HAS_RATING_RATIO'] %}modified-input{% endif %}">
+                            </div>
+                            <div class="form-group">
+                                <label for="HAS_RATING_SEED">Seed</label>
+                                <input type="number" id="HAS_RATING_SEED" name="HAS_RATING_SEED" value="{{ settings['HAS_RATING_SEED'] }}" class="{% if settings['HAS_RATING_SEED'] != defaults['HAS_RATING_SEED'] %}modified-input{% endif %}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </form>
+
+        <div class="action-bar">
+            <form action="/admin/reset" method="POST" style="margin:0;">
+                <button type="submit" class="btn-reset">Reset Defaults</button>
+            </form>
+            <button type="submit" form="update-form" class="btn-save">Save Changes & Reload Data</button>
+        </div>
+    </div>
+</body>
+</html>

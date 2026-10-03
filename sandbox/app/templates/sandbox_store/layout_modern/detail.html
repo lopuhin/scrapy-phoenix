@@ -1,0 +1,178 @@
+{% extends "sandbox_store/layout_modern/base.html" %}
+
+{% block title %}Spec Sheet: {{ product.name }}{% endblock %}
+
+{% block main_body %}
+<div class="nav-path" style="margin-bottom: 2rem; color: #888;">
+    <a href="/sandbox-store/">Dashboard</a> /
+    {% if parent_category %}
+    <a href="/sandbox-store/category/{{ parent_category.id }}">{{ parent_category.name }}</a> /
+    {% endif %}
+    {% if category %}
+    <a href="/sandbox-store/category/{{ category.id }}">{{ category.name }}</a> /
+    {% endif %}
+    <span>Spec Sheet</span>
+</div>
+
+<div class="spec-sheet" style="display: flex; gap: 4rem; flex-wrap: wrap;">
+    <div class="data-column" style="flex: 2; min-width: 300px;">
+        <h1 style="font-size: 2.5rem; margin-top: 0;">{{ product.name }}</h1>
+        <p style="font-size: 1.2rem; line-height: 1.6;">{{ product.description }}</p>
+
+        <div class="technical-data" style="margin-top: 3rem; background: #333; padding: 2rem; border-radius: 8px;">
+            <div class="metrics-panel" style="display: flex; justify-content: space-between; margin-bottom: 2rem; border-bottom: 1px solid #444; padding-bottom: 1rem;">
+                <div class="metric-score">
+                    <span style="font-size: 2rem; font-weight: bold; color: var(--accent);">{{ product.rating }}</span>
+                    <span style="color: #aaa; font-size: 0.8rem;">/ 5.0</span>
+                </div>
+                <div class="metric-volume">
+                    <span style="color: #eee; font-weight: bold;">{{ product.reviews_count }}</span>
+                    <span style="color: #aaa; font-size: 0.8rem; text-transform: uppercase;">Verified Signals</span>
+                </div>
+            </div>
+
+            <h3 style="color: #888; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; margin-top: 0;">Technical Attributes</h3>
+            <table style="width: 100%; text-align: left;">
+                {% for key, value in product.attributes.items() %}
+                <tr>
+                    <td style="padding: 10px 0; color: #aaa; border-bottom: 1px solid #444;">{{ key }}</td>
+                    <td style="padding: 10px 0; border-bottom: 1px solid #444; font-weight: bold;">{{ value }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <div class="visual-column" style="flex: 1; min-width: 250px;">
+        <div style="background: #fff; padding: 10px; transform: rotate(2deg);">
+            <img id="main-image" src="{{ product.image_url }}" style="width: 100%; display: block;">
+        </div>
+
+        <div class="acquisition-panel" style="margin-top: 2rem; text-align: center;">
+            <div id="price-container">
+                {% if product.original_price %}
+                <div class="cost-display" style="font-size: 3rem; font-weight: 100; color: var(--accent);">
+                    <span id="price-val">{{ product.price }}</span> <span style="font-size: 1rem;">{{ product.currency }}</span>
+                </div>
+                <div id="was-price-val" style="color: #777; font-size: 1.2rem;">
+                    PREVIOUSLY: {{ product.original_price }}
+                </div>
+                {% else %}
+                <div class="cost-display" style="font-size: 3rem; font-weight: 100; color: var(--accent);">
+                    <span id="price-val">{{ product.price }}</span> <span style="font-size: 1rem;">{{ product.currency }}</span>
+                </div>
+                <div id="was-price-val" style="display: none; color: #777; font-size: 1.2rem;"></div>
+                {% endif %}
+            </div>
+
+            <div id="availability-section" style="margin-top: 1rem;">
+                {% if product.in_stock %}
+                <div class="status-indicator online" style="color: var(--accent); font-family: monospace;">[ STATUS: ONLINE ]</div>
+                {% else %}
+                <div class="status-indicator offline" style="color: #ff3333; font-family: monospace;">[ STATUS: OFFLINE ]</div>
+                {% endif %}
+            </div>
+
+            {% if product.variants %}
+            <div class="variant-selector-container" style="margin: 1rem 0; text-align: left;">
+                {% for option_name, values in variant_options.items() %}
+                <div style="margin-bottom: 1rem;">
+                    <label style="color: #aaa; display: block; margin-bottom: 5px; font-size: 0.9rem;">{{ option_name }}</label>
+                    <select class="variant-selector" data-attribute="{{ option_name }}" style="background: #444; color: #fff; border: 1px solid #555; padding: 0.5rem; width: 100%;">
+                        {% for value in values %}
+                        <option value="{{ value }}">{{ value }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <button id="buy-btn" style="background: {% if product.in_stock %}var(--accent){% else %}#555{% endif %}; color: #000; border: none; padding: 1rem 2rem; font-weight: bold; font-size: 1.2rem; cursor: {% if product.in_stock %}pointer{% else %}not-allowed{% endif %}; width: 100%; margin-top: 1rem;">
+                {% if product.in_stock %}ACQUIRE ASSET{% else %}UNAVAILABLE{% endif %}
+            </button>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const variantsData = [
+            {% for variant in product.variants %}
+            {
+                "id": "{{ variant.id }}",
+                "price": {{ variant.price }},
+                "original_price": {{ variant.original_price if variant.original_price else 'null' }},
+                "in_stock": {{ 'true' if variant.in_stock else 'false' }},
+                "sku": "{{ variant.sku }}",
+                "attributes": {{ variant.attributes|tojson }},
+                "image_url": "{{ variant.image_url }}"
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        const selectors = document.querySelectorAll('.variant-selector');
+        const priceVal = document.getElementById('price-val');
+        const wasPriceVal = document.getElementById('was-price-val');
+        const mainImage = document.getElementById('main-image');
+        const availabilitySection = document.getElementById('availability-section');
+        const buyBtn = document.getElementById('buy-btn');
+
+        if (variantsData.length > 0 && selectors.length > 0) {
+            function updateVariant() {
+                const currentSelection = {};
+                selectors.forEach(sel => {
+                    currentSelection[sel.getAttribute('data-attribute')] = sel.value;
+                });
+
+                const match = variantsData.find(variant => {
+                    for (const [key, value] of Object.entries(currentSelection)) {
+                        if (variant.attributes[key] !== value) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+
+                if (match) {
+                    priceVal.textContent = match.price;
+                    if (match.original_price) {
+                        wasPriceVal.style.display = 'block';
+                        wasPriceVal.textContent = 'PREVIOUSLY: ' + match.original_price;
+                    } else {
+                        wasPriceVal.style.display = 'none';
+                    }
+
+                    if (match.image_url) {
+                        mainImage.src = match.image_url;
+                    }
+
+                    if (match.in_stock) {
+                        availabilitySection.innerHTML = '<div class="status-indicator online" style="color: var(--accent); font-family: monospace;">[ STATUS: ONLINE ]</div>';
+                        buyBtn.style.background = 'var(--accent)';
+                        buyBtn.style.cursor = 'pointer';
+                        buyBtn.textContent = 'ACQUIRE ASSET';
+                        buyBtn.disabled = false;
+                    } else {
+                        availabilitySection.innerHTML = '<div class="status-indicator offline" style="color: #ff3333; font-family: monospace;">[ STATUS: OFFLINE ]</div>';
+                        buyBtn.style.background = '#555';
+                        buyBtn.style.cursor = 'not-allowed';
+                        buyBtn.textContent = 'UNAVAILABLE';
+                        buyBtn.disabled = true;
+                    }
+                } else {
+                    priceVal.textContent = "---";
+                    wasPriceVal.style.display = 'none';
+                    buyBtn.disabled = true;
+                }
+            }
+
+            selectors.forEach(sel => {
+                sel.addEventListener('change', updateVariant);
+            });
+
+            updateVariant();
+        }
+    });
+</script>
+{% endblock %}

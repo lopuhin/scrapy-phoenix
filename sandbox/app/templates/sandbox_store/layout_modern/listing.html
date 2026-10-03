@@ -1,0 +1,88 @@
+{% extends "sandbox_store/layout_modern/base.html" %}
+
+{% block title %}{{ category.name }} - Modern Store{% endblock %}
+
+{% block main_body %}
+<div class="nav-path" style="margin-bottom: 2rem; color: #888;">
+    <a href="/sandbox-store/">Dashboard</a> /
+    {% if parent_category %}
+    <a href="/sandbox-store/category/{{ parent_category.id }}">{{ parent_category.name }}</a> /
+    {% endif %}
+    <span style="color: #eee;">{{ category.name }}</span>
+</div>
+
+<h1 style="border-bottom: 2px solid #444; padding-bottom: 1rem;">{{ category.name }}</h1>
+
+<!-- Subcats as tags -->
+{% if category.subcategories %}
+<div class="tags-cloud" style="margin-bottom: 2rem;">
+    {% for sub in category.subcategories %}
+    <a href="/sandbox-store/category/{{ sub.id }}" style="display: inline-block; background: #444; color: #fff; padding: 5px 15px; border-radius: 4px; margin-right: 10px; font-size: 0.9rem;">{{ sub.name }}</a>
+    {% endfor %}
+</div>
+{% endif %}
+
+<!-- Different structure: Table layout for products -->
+<div class="inventory-table">
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="text-align: left; color: #888;">
+                <th style="padding: 1rem;">Item</th>
+                <th style="padding: 1rem;">Preview</th>
+                <th style="padding: 1rem;">Cost</th>
+                <th style="padding: 1rem;">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for product in products %}
+            <tr style="border-bottom: 1px solid #444;">
+                <td style="padding: 1rem;">
+                    <strong class="item-header" style="font-size: 1.1rem; display: block;">{{ product.name }}</strong>
+                    {% if not product.in_stock %}
+                    <div class="status-indicator offline" style="display: inline-block; width: 10px; height: 10px; background-color: #ff3333; border-radius: 50%; margin-right: 5px;"></div>
+                    <span style="color: #ff3333; font-size: 0.8rem; font-weight: bold;">UNAVAILABLE</span>
+                    {% endif %}
+                    <span style="font-size: 0.8rem; color: #777;">{{ product.id }}</span>
+                    {% if product.variants %}
+                    <div style="font-size: 0.75rem; color: var(--accent); margin-top: 4px; opacity: 0.8;">
+                        OPTIONS: {{ product.variants[0].attributes.keys() | join(', ') | upper }}
+                    </div>
+                    {% endif %}
+                </td>
+                <td style="padding: 1rem;">
+                    <div style="width: 60px; height: 60px; background: #555; overflow: hidden; border-radius: 50%;">
+                        <img src="{{ product.image_url }}" style="width: 100%; height: 100%; object-fit: cover;">
+                    </div>
+                </td>
+                <td style="padding: 1rem; color: var(--accent);">
+                    {% if product.original_price %}
+                    <div class="price-stack">
+                        <div class="current-val" style="font-weight: bold; font-size: 1.2rem;">{{ product.currency }} {{ product.price }}</div>
+                        <div class="was-val" style="font-size: 0.8rem; color: #777; margin-top: 2px;">WAS: {{ product.currency }} {{ product.original_price }}</div>
+                    </div>
+                    {% else %}
+                    {{ product.currency }} {{ product.price }}
+                    {% endif %}
+                </td>
+                <td style="padding: 1rem;">
+                    <a href="/sandbox-store/product/{{ product.id }}">View Specs</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Pagination as a slider-like control -->
+<div class="control-panel" style="margin-top: 3rem; display: flex; justify-content: center; align-items: center; gap: 1rem;">
+    {% if page > 1 %}
+    <button onclick="window.location.href='?page={{ page - 1 }}'" style="background: transparent; border: 1px solid #666; color: #eee; padding: 5px 10px; cursor: pointer;">&larr;</button>
+    {% endif %}
+
+    <span style="font-family: monospace;">PAGE {{ page }} / {{ total_pages }}</span>
+
+    {% if page < total_pages %}
+    <button onclick="window.location.href='?page={{ page + 1 }}'" style="background: transparent; border: 1px solid #666; color: #eee; padding: 5px 10px; cursor: pointer;">&rarr;</button>
+    {% endif %}
+</div>
+{% endblock %}

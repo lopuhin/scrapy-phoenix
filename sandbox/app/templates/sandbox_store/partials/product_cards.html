@@ -1,0 +1,30 @@
+{% for product in products %}
+<div class="card product-card">
+    <a href="/sandbox-store/product/{{ product.id }}">
+        <img src="{{ product.image_url }}" alt="{{ product.name }}">
+        <div class="card-body">
+            <h3 class="card-title">{{ product.name }}</h3>
+            {% if not product.in_stock %}
+            <span class="badge badge-danger" style="background-color: #dc3545; color: white; padding: 0.25em 0.4em; font-size: 75%; border-radius: 0.25rem;">Out of Stock</span>
+            {% endif %}
+            <div class="card-price">
+                {% if product.original_price %}
+                <span class="original-price" style="text-decoration: line-through; color: #999; font-size: 0.9em; margin-right: 5px;">
+                    {{ product.currency }} {{ product.original_price }}
+                </span>
+                <span class="discounted-price" style="color: #d9534f;">
+                    {{ product.currency }} {{ product.price }}
+                </span>
+                {% else %}
+                {{ product.currency }} {{ product.price }}
+                {% endif %}
+            </div>
+            {% if product.variants %}
+            <div class="variant-info" style="font-size: 0.85rem; color: #777; margin-top: 0.5rem;">
+                Available in: {{ product.variants[0].attributes.keys() | join(', ') }}
+            </div>
+            {% endif %}
+        </div>
+    </a>
+</div>
+{% endfor %}

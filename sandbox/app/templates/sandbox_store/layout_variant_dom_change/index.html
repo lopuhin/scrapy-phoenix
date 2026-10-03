@@ -1,0 +1,24 @@
+{% extends "sandbox_store/layout_variant_dom_change/base.html" %}
+
+{% block title %}Home - Sandbox Store{% endblock %}
+
+{% block content %}
+<div class="hero" style="text-align: center; margin-bottom: 3rem;">
+    <h1>Welcome to the Sandbox Store</h1>
+    <p>Browse our fake categories to test your spiders.</p>
+</div>
+
+<h2>Shop by Category</h2>
+<div class="grid grid-4">
+    {% for category in categories %}
+    <div class="card">
+        <a href="/sandbox-store/category/{{ category.id }}">
+            <div class="card-body" style="text-align: center; padding: 3rem 1rem;">
+                <h3 class="card-title">{{ category.name }}</h3>
+                <p style="color: #777;">{{ category.subcategories|length }} subcategories</p>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

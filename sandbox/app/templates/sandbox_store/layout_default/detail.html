@@ -1,0 +1,169 @@
+{% extends "sandbox_store/layout_default/base.html" %}
+
+{% block title %}{{ product.name }} - Sandbox Store{% endblock %}
+
+{% block content %}
+<div class="breadcrumbs">
+    <a href="/sandbox-store/">Home</a> &gt;
+    {% if parent_category %}
+    <a href="/sandbox-store/category/{{ parent_category.id }}">{{ parent_category.name }}</a> &gt;
+    {% endif %}
+    {% if category %}
+    <a href="/sandbox-store/category/{{ category.id }}">{{ category.name }}</a> &gt;
+    {% endif %}
+    <span>{{ product.name }}</span>
+</div>
+
+<div class="product-detail">
+    <div class="product-image">
+        <img id="main-image" src="{{ product.image_url }}" alt="{{ product.name }}" style="width: 100%; border-radius: 8px;">
+    </div>
+    <div class="product-info">
+        <h1>{{ product.name }}</h1>
+        <div class="price-tag" id="price-display">
+            {% if product.original_price %}
+            <span class="original-price" style="text-decoration: line-through; color: #999; font-size: 0.8em; margin-right: 10px;">{{ product.currency }} {{ product.original_price }}</span>
+            <span class="current-price" style="color: #d9534f;">{{ product.currency }} {{ product.price }}</span>
+            {% else %}
+            {{ product.currency }} {{ product.price }}
+            {% endif %}
+        </div>
+
+        <div id="stock-display" style="margin-bottom: 1rem;">
+            {% if product.in_stock %}
+            <span class="stock-status in-stock" style="color: green; font-weight: bold;">In Stock</span>
+            {% else %}
+            <span class="stock-status out-of-stock" style="color: red; font-weight: bold;">Out of Stock</span>
+            {% endif %}
+        </div>
+
+        {% if product.variants %}
+        <div class="variants-selection" id="variants-container" style="margin: 1.5rem 0;">
+            {% for option_name, values in variant_options.items() %}
+            <div class="variant-option" style="margin-bottom: 1rem;">
+                <label for="select-{{ option_name }}" style="font-weight: bold; display: block; margin-bottom: 0.5rem;">{{ option_name }}:</label>
+                <select id="select-{{ option_name }}" class="variant-selector" data-attribute="{{ option_name }}" style="padding: 0.5rem; width: 100%; max-width: 300px; font-size: 1rem;">
+                    {% for value in values %}
+                    <option value="{{ value }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <div class="rating-container" style="margin-bottom: 1rem; display: flex; align-items: center;">
+            <div class="stars-outer" style="display: inline-block; position: relative; font-family: sans-serif; font-size: 1.5rem; color: #ccc; letter-spacing: 2px;" title="{{ product.rating }} out of 5">
+                <span class="stars-empty">★★★★★</span>
+                <div class="stars-inner" style="position: absolute; top: 0; left: 0; white-space: nowrap; overflow: hidden; width: {{ (product.rating / 5 * 100)|round }}%; color: #f8ce0b;">
+                    ★★★★★
+                </div>
+            </div>
+            <div class="rating-text" style="margin-left: 0.5rem; font-weight: bold;">{{ product.rating }}</div>
+            <div class="reviews" style="color: #777; font-size: 0.9rem; margin-left: 0.5rem;">
+                ({{ product.reviews_count }} reviews)
+            </div>
+        </div>
+
+        <p>{{ product.description }}</p>
+
+        <button id="add-to-cart-btn" class="btn-buy" {% if not product.in_stock %}disabled style="background: #ccc; cursor: not-allowed;"{% endif %}>
+            {% if product.in_stock %}Add to Cart{% else %}Out of Stock{% endif %}
+        </button>
+
+        <div class="attributes">
+            <dl>
+                {% for key, value in product.attributes.items() %}
+                <dt>{{ key }}</dt>
+                <dd>{{ value }}</dd>
+                {% endfor %}
+            </dl>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const variantsData = [
+            {% for variant in product.variants %}
+            {
+                "id": "{{ variant.id }}",
+                "price": {{ variant.price }},
+                "original_price": {{ variant.original_price if variant.original_price else 'null' }},
+                "in_stock": {{ 'true' if variant.in_stock else 'false' }},
+                "sku": "{{ variant.sku }}",
+                "attributes": {{ variant.attributes|tojson }},
+                "image_url": "{{ variant.image_url }}"
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ];
+
+        const selectors = document.querySelectorAll('.variant-selector');
+        const priceDisplay = document.getElementById('price-display');
+        const stockDisplay = document.getElementById('stock-display');
+        const addToCartBtn = document.getElementById('add-to-cart-btn');
+        const mainImage = document.getElementById('main-image');
+        const currency = "{{ product.currency }}";
+
+        if (variantsData.length > 0 && selectors.length > 0) {
+            function updateVariant() {
+                const currentSelection = {};
+                selectors.forEach(sel => {
+                    currentSelection[sel.getAttribute('data-attribute')] = sel.value;
+                });
+
+                const match = variantsData.find(variant => {
+                    for (const [key, value] of Object.entries(currentSelection)) {
+                        if (variant.attributes[key] !== value) {
+                            return false;
+                        }
+                    }
+                    return true;
+                });
+
+                if (match) {
+                    // Update Price
+                    let priceHtml = '';
+                    if (match.original_price) {
+                        priceHtml = `<span class="original-price" style="text-decoration: line-through; color: #999; font-size: 0.8em; margin-right: 10px;">${currency} ${match.original_price}</span>
+                                     <span class="current-price" style="color: #d9534f;">${currency} ${match.price}</span>`;
+                    } else {
+                        priceHtml = `${currency} ${match.price}`;
+                    }
+                    priceDisplay.innerHTML = priceHtml;
+
+                    // Update Image
+                    if (match.image_url) {
+                        mainImage.src = match.image_url;
+                    }
+
+                    // Update Stock
+                    if (match.in_stock) {
+                        stockDisplay.innerHTML = '<span class="stock-status in-stock" style="color: green; font-weight: bold;">In Stock</span>';
+                        addToCartBtn.disabled = false;
+                        addToCartBtn.style.background = '#007bff';
+                        addToCartBtn.style.cursor = 'pointer';
+                        addToCartBtn.textContent = 'Add to Cart';
+                    } else {
+                        stockDisplay.innerHTML = '<span class="stock-status out-of-stock" style="color: red; font-weight: bold;">Out of Stock</span>';
+                        addToCartBtn.disabled = true;
+                        addToCartBtn.style.background = '#ccc';
+                        addToCartBtn.style.cursor = 'not-allowed';
+                        addToCartBtn.textContent = 'Out of Stock';
+                    }
+                } else {
+                    priceDisplay.textContent = "Unavailable";
+                    stockDisplay.innerHTML = "";
+                    addToCartBtn.disabled = true;
+                }
+            }
+
+            selectors.forEach(sel => {
+                sel.addEventListener('change', updateVariant);
+            });
+
+            updateVariant();
+        }
+    });
+</script>
+{% endblock %}

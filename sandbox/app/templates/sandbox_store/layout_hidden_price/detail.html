@@ -1,0 +1,218 @@
+{% extends "sandbox_store/layout_hidden_price/base.html" %}
+
+{% block title %}{{ product.name }} - Sandbox Store{% endblock %}
+
+{% block content %}
+<div class="breadcrumbs">
+    <a href="/sandbox-store/">Home</a> &gt;
+    {% if parent_category %}
+    <a href="/sandbox-store/category/{{ parent_category.id }}">{{ parent_category.name }}</a> &gt;
+    {% endif %}
+    {% if category %}
+    <a href="/sandbox-store/category/{{ category.id }}">{{ category.name }}</a> &gt;
+    {% endif %}
+    <span>{{ product.name }}</span>
+</div>
+
+<div class="product-detail">
+    <div class="product-image">
+        <img id="main-image" src="{{ product.image_url }}" alt="{{ product.name }}" style="width: 100%; border-radius: 8px;">
+    </div>
+    <div class="product-info">
+        <h1>{{ product.name }}</h1>
+
+        <!-- Price is hidden by default -->
+        <div class="price-container" style="margin-bottom: 1rem;">
+            <div id="price-display" style="font-weight: bold; font-size: 1.5rem; display: none;">
+                <!-- Price will be injected here -->
+            </div>
+            <button id="reveal-price-btn" class="btn-reveal" style="background: #28a745; color: white; border: none; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;">
+                Add to Cart to See Price
+            </button>
+        </div>
+
+        <div id="stock-display" style="margin-bottom: 1rem;">
+            {% if product.in_stock %}
+            <span class="stock-status in-stock" style="color: green; font-weight: bold;">In Stock</span>
+            {% else %}
+            <span class="stock-status out-of-stock" style="color: red; font-weight: bold;">Out of Stock</span>
+            {% endif %}
+        </div>
+
+        {% if product.variants %}
+        <div class="variants-selection" id="variants-container" style="margin: 1.5rem 0;">
+            {% for option_name, values in variant_options.items() %}
+            <div class="variant-option" style="margin-bottom: 1rem;">
+                <label for="select-{{ option_name }}" style="font-weight: bold; display: block; margin-bottom: 0.5rem;">{{ option_name }}:</label>
+                <select id="select-{{ option_name }}" class="variant-selector" data-attribute="{{ option_name }}" style="padding: 0.5rem; width: 100%; max-width: 300px; font-size: 1rem;">
+                    {% for value in values %}
+                    <option value="{{ value }}">{{ value }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Hidden JSON for Spiders but WITHOUT Price info to force AJAX call -->
+        <script type="application/json" id="variants-data">
+        [
+            {% for variant in product.variants %}
+            {
+                "id": "{{ variant.id }}",
+                "in_stock": {{ 'true' if variant.in_stock else 'false' }},
+                "sku": "{{ variant.sku }}",
+                "attributes": {{ variant.attributes|tojson }},
+                "image_url": "{{ variant.image_url }}"
+            }{% if not loop.last %},{% endif %}
+            {% endfor %}
+        ]
+        </script>
+        {% endif %}
+
+        <div class="rating-container" style="margin-bottom: 1rem; display: flex; align-items: center;">
+            <div class="stars-outer" style="display: inline-block; position: relative; font-family: sans-serif; font-size: 1.5rem; color: #ccc; letter-spacing: 2px;" title="{{ product.rating }} out of 5">
+                <span class="stars-empty">★★★★★</span>
+                <div class="stars-inner" style="position: absolute; top: 0; left: 0; white-space: nowrap; overflow: hidden; width: {{ (product.rating / 5 * 100)|round }}%; color: #f8ce0b;">
+                    ★★★★★
+                </div>
+            </div>
+            <div class="rating-text" style="margin-left: 0.5rem; font-weight: bold;">{{ product.rating }}</div>
+            <div class="reviews" style="color: #777; font-size: 0.9rem; margin-left: 0.5rem;">
+                ({{ product.reviews_count }} reviews)
+            </div>
+        </div>
+
+        <p>{{ product.description }}</p>
+
+        <div class="attributes">
+            <dl>
+                {% for key, value in product.attributes.items() %}
+                <dt>{{ key }}</dt>
+                <dd>{{ value }}</dd>
+                {% endfor %}
+            </dl>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const variantsData = JSON.parse(document.getElementById('variants-data')?.textContent || '[]');
+        const selectors = document.querySelectorAll('.variant-selector');
+        const priceDisplay = document.getElementById('price-display');
+        const revealBtn = document.getElementById('reveal-price-btn');
+        const mainImage = document.getElementById('main-image');
+        const currency = "{{ product.currency }}";
+
+        let currentVariantId = null;
+
+        // Initial product ID if no variants
+        {% if not product.variants %}
+        currentVariantId = "{{ product.id }}";
+        {% endif %}
+
+        function getSelectedVariantId() {
+            if (variantsData.length === 0) return "{{ product.id }}";
+
+            const currentSelection = {};
+            selectors.forEach(sel => {
+                currentSelection[sel.getAttribute('data-attribute')] = sel.value;
+            });
+
+            const match = variantsData.find(variant => {
+                for (const [key, value] of Object.entries(currentSelection)) {
+                    if (variant.attributes[key] !== value) {
+                        return false;
+                    }
+                }
+                return true;
+            });
+
+            if (match) {
+                if (match.image_url) mainImage.src = match.image_url;
+                return match.id;
+            }
+            return null;
+        }
+
+        // Fetch price from API
+        function fetchPrice(id) {
+            if (!id) return;
+
+            revealBtn.textContent = "Loading...";
+            revealBtn.disabled = true;
+
+            // Using the hidden data API we created earlier to fetch full product/variant info
+            // Note: In a real app this would probably be a specific pricing endpoint
+            // We'll use /sandbox-store/data/product/{id} which returns the full product object (including price)
+            // But wait, the data endpoint returns the MAIN product. We need variant specific price.
+            // Actually, the main data endpoint is structure for the product ID.
+            // If it's a variant ID, does the data manager support get_product(variant_id)?
+            // Let's check DataManager.get_product. It searches in self.products.
+            // Variants are inside products, not top level keys in self.products (usually).
+            // Let's check DataManager structure.
+
+            // Checking data.py: self.products[p_id] = product. Variants are inside.
+            // So we can't fetch a variant by ID from /data/product/{id} unless we expose variants there.
+            // But we can fetch the MAIN product data, which contains all variants and their prices.
+
+            // Fetch from dedicated price endpoint
+            fetch(`/sandbox-store/partials/price/{{ product.id }}`)
+                .then(response => response.json())
+                .then(data => {
+                    let price = null;
+                    let originalPrice = null;
+
+                    if (variantsData.length > 0) {
+                        // Find the variant in the returned data
+                        const variant = data.variants.find(v => v.id === id);
+                        if (variant) {
+                            price = variant.price;
+                            originalPrice = variant.original_price;
+                        }
+                    } else {
+                        price = data.price;
+                        originalPrice = data.original_price;
+                    }
+
+                    if (price !== null) {
+                        let priceHtml = '';
+                        if (originalPrice) {
+                            priceHtml = `<span class="original-price" style="text-decoration: line-through; color: #999; font-size: 0.8em; margin-right: 10px;">${currency} ${originalPrice}</span>
+                                         <span class="current-price" style="color: #d9534f;">${currency} ${price}</span>`;
+                        } else {
+                            priceHtml = `${currency} ${price}`;
+                        }
+                        priceDisplay.innerHTML = priceHtml;
+                        priceDisplay.style.display = 'block';
+                        revealBtn.style.display = 'none';
+                    }
+                })
+                .catch(err => {
+                    console.error('Error fetching price:', err);
+                    revealBtn.textContent = "Error";
+                });
+        }
+
+        if (selectors.length > 0) {
+            selectors.forEach(sel => {
+                sel.addEventListener('change', function() {
+                    // Reset price display on variant change
+                    priceDisplay.style.display = 'none';
+                    revealBtn.style.display = 'inline-block';
+                    revealBtn.textContent = "Add to Cart to See Price";
+                    revealBtn.disabled = false;
+
+                    currentVariantId = getSelectedVariantId();
+                });
+            });
+            // Initial ID
+            currentVariantId = getSelectedVariantId();
+        }
+
+        revealBtn.addEventListener('click', function() {
+            fetchPrice(currentVariantId);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends "sandbox_store/layout_infinite_scroll/base.html" %}
+
+{% block title %}{{ category.name }} - Sandbox Store{% endblock %}
+
+{% block content %}
+<div class="breadcrumbs">
+    <a href="/sandbox-store/">Home</a> &gt;
+    {% if parent_category %}
+    <a href="/sandbox-store/category/{{ parent_category.id }}">{{ parent_category.name }}</a> &gt;
+    {% endif %}
+    <span>{{ category.name }}</span>
+</div>
+
+<h1>{{ category.name }}</h1>
+
+{% if category.subcategories %}
+<div class="grid grid-4" style="margin-bottom: 3rem;">
+    {% for sub in category.subcategories %}
+    <div class="card">
+        <a href="/sandbox-store/category/{{ sub.id }}">
+            <div class="card-body" style="text-align: center; padding: 2rem 1rem;">
+                <h3 class="card-title">{{ sub.name }}</h3>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="grid grid-3" id="product-grid">
+    {% include "sandbox_store/partials/product_cards.html" %}
+</div>
+
+<!-- Infinite Scroll Sentinel & Loader -->
+<div id="sentinel" style="height: 100px; margin-top: 2rem; text-align: center; display: flex; justify-content: center; align-items: center;">
+    <div id="loader" style="display: none; width: 40px; height: 40px; border: 4px solid #f3f3f3; border-top: 4px solid #007bff; border-radius: 50%; animation: spin 1s linear infinite;"></div>
+    <p id="end-message" style="display: none; color: #777;">No more products to load.</p>
+</div>
+
+<style>
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const grid = document.getElementById('product-grid');
+        const sentinel = document.getElementById('sentinel');
+        const loader = document.getElementById('loader');
+        const endMessage = document.getElementById('end-message');
+
+        let currentPage = {{ page }};
+        const totalPages = {{ total_pages }};
+        let isLoading = false;
+
+        // If we are already at the last page, show end message immediately
+        if (currentPage >= totalPages) {
+            endMessage.style.display = 'block';
+            return;
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting && !isLoading && currentPage < totalPages) {
+                loadMore();
+            }
+        }, {
+            root: null, // viewport
+            rootMargin: '0px',
+            threshold: 0.1
+        });
+
+        observer.observe(sentinel);
+
+        function loadMore() {
+            isLoading = true;
+            loader.style.display = 'block';
+
+            const nextPage = currentPage + 1;
+
+            fetch(`/sandbox-store/partials/products?category_id={{ category.id }}&page=${nextPage}`)
+                .then(response => response.text())
+                .then(html => {
+                    grid.insertAdjacentHTML('beforeend', html);
+
+                    currentPage = nextPage;
+                    isLoading = false;
+                    loader.style.display = 'none';
+
+                    if (currentPage >= totalPages) {
+                        observer.unobserve(sentinel);
+                        endMessage.style.display = 'block';
+                    }
+                })
+                .catch(err => {
+                    console.error('Error loading items:', err);
+                    isLoading = false;
+                    loader.style.display = 'none';
+                });
+        }
+    });
+</script>
+{% endblock %}

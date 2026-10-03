@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Modern Store{% endblock %}</title>
+    <style>
+        :root { --bg: #222; --text: #eee; --accent: #00d2ff; --secondary: #333; }
+        body { margin: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background: var(--bg); color: var(--text); display: flex; min-height: 100vh; }
+
+        /* Sidebar Navigation */
+        aside.sidebar { width: 250px; background: var(--secondary); padding: 2rem; display: flex; flex-direction: column; }
+        aside.sidebar h1 { font-size: 1.2rem; margin-bottom: 2rem; color: var(--accent); }
+        aside.sidebar nav a { display: block; padding: 10px 0; color: #aaa; text-decoration: none; border-bottom: 1px solid #444; }
+        aside.sidebar nav a:hover { color: #fff; padding-left: 5px; transition: 0.3s; }
+
+        /* Main Content */
+        main.content-wrapper { flex: 1; padding: 3rem; overflow-y: auto; }
+
+        /* Links */
+        a { color: var(--accent); text-decoration: none; }
+
+        /* Footer */
+        footer.site-footer { margin-top: 4rem; padding-top: 2rem; border-top: 1px solid #444; color: #666; font-size: 0.8rem; }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <h1>MODERN STORE</h1>
+        <nav>
+            <a href="/sandbox-store/">Dashboard</a>
+            <a href="#">Settings</a>
+            <a href="#">Profile</a>
+        </nav>
+    </aside>
+
+    <main class="content-wrapper">
+        {% block main_body %}{% endblock %}
+
+        <footer class="site-footer">
+            System Status: Operational | 2026
+        </footer>
+    </main>
+</body>
+</html>

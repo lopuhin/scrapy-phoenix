@@ -1,0 +1,83 @@
+{% extends "sandbox_store/layout_hidden_price/base.html" %}
+
+{% block title %}{{ category.name }} - Sandbox Store{% endblock %}
+
+{% block content %}
+<div class="breadcrumbs">
+    <a href="/sandbox-store/">Home</a> &gt;
+    {% if parent_category %}
+    <a href="/sandbox-store/category/{{ parent_category.id }}">{{ parent_category.name }}</a> &gt;
+    {% endif %}
+    <span>{{ category.name }}</span>
+</div>
+
+<h1>{{ category.name }}</h1>
+
+{% if category.subcategories %}
+<div class="grid grid-4" style="margin-bottom: 3rem;">
+    {% for sub in category.subcategories %}
+    <div class="card">
+        <a href="/sandbox-store/category/{{ sub.id }}">
+            <div class="card-body" style="text-align: center; padding: 2rem 1rem;">
+                <h3 class="card-title">{{ sub.name }}</h3>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="grid grid-3">
+    {% for product in products %}
+    <div class="card">
+        <a href="/sandbox-store/product/{{ product.id }}">
+            <img src="{{ product.image_url }}" alt="{{ product.name }}">
+            <div class="card-body">
+                <h3 class="card-title">{{ product.name }}</h3>
+                {% if not product.in_stock %}
+                <span class="badge badge-danger" style="background-color: #dc3545; color: white; padding: 0.25em 0.4em; font-size: 75%; border-radius: 0.25rem;">Out of Stock</span>
+                {% endif %}
+                <div class="card-price">
+                    {% if product.original_price %}
+                    <span class="original-price" style="text-decoration: line-through; color: #999; font-size: 0.9em; margin-right: 5px;">
+                        {{ product.currency }} {{ product.original_price }}
+                    </span>
+                    <span class="discounted-price" style="color: #d9534f;">
+                        {{ product.currency }} {{ product.price }}
+                    </span>
+                    {% else %}
+                    {{ product.currency }} {{ product.price }}
+                    {% endif %}
+                </div>
+                {% if product.variants %}
+                <div class="variant-info" style="font-size: 0.85rem; color: #777; margin-top: 0.5rem;">
+                    Available in: {{ product.variants[0].attributes.keys() | join(', ') }}
+                </div>
+                {% endif %}
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Pagination -->
+<div class="pagination">
+    {% if page > 1 %}
+    <a href="?page={{ page - 1 }}">&laquo; Prev</a>
+    {% endif %}
+
+    {% for p in range(1, total_pages + 1) %}
+        {% if p == page %}
+        <a href="?page={{ p }}" class="active">{{ p }}</a>
+        {% elif p <= 3 or p >= total_pages - 2 or (p >= page - 1 and p <= page + 1) %}
+        <a href="?page={{ p }}">{{ p }}</a>
+        {% elif p == 4 or p == total_pages - 3 %}
+        <span>...</span>
+        {% endif %}
+    {% endfor %}
+
+    {% if page < total_pages %}
+    <a href="?page={{ page + 1 }}">Next &raquo;</a>
+    {% endif %}
+</div>
+{% endblock %}

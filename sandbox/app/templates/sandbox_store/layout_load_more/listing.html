@@ -1,0 +1,101 @@
+{% extends "sandbox_store/layout_load_more/base.html" %}
+
+{% block title %}{{ category.name }} - Sandbox Store{% endblock %}
+
+{% block content %}
+<div class="breadcrumbs">
+    <a href="/sandbox-store/">Home</a> &gt;
+    {% if parent_category %}
+    <a href="/sandbox-store/category/{{ parent_category.id }}">{{ parent_category.name }}</a> &gt;
+    {% endif %}
+    <span>{{ category.name }}</span>
+</div>
+
+<h1>{{ category.name }}</h1>
+
+{% if category.subcategories %}
+<div class="grid grid-4" style="margin-bottom: 3rem;">
+    {% for sub in category.subcategories %}
+    <div class="card">
+        <a href="/sandbox-store/category/{{ sub.id }}">
+            <div class="card-body" style="text-align: center; padding: 2rem 1rem;">
+                <h3 class="card-title">{{ sub.name }}</h3>
+            </div>
+        </a>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="grid grid-3" id="product-grid">
+    {% include "sandbox_store/partials/product_cards.html" %}
+</div>
+
+<!-- Load More Control -->
+<div class="pagination-container" style="text-align: center; margin-top: 3rem;">
+    {% if page < total_pages %}
+    <button id="load-more-btn" class="btn-load-more">Show More</button>
+    {% endif %}
+    <p id="loading-text" style="display: none; color: #777;">Loading...</p>
+</div>
+
+<style>
+    .btn-load-more {
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 1rem 3rem;
+        font-size: 1.1rem;
+        border-radius: 30px;
+        cursor: pointer;
+        transition: background 0.2s;
+    }
+    .btn-load-more:hover {
+        background: #0056b3;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const btn = document.getElementById('load-more-btn');
+        const grid = document.getElementById('product-grid');
+        const loading = document.getElementById('loading-text');
+
+        let currentPage = {{ page }};
+        const totalPages = {{ total_pages }};
+
+        if (btn) {
+            btn.addEventListener('click', function() {
+                if (currentPage >= totalPages) return;
+
+                const nextPage = currentPage + 1;
+
+                // UI updates
+                btn.style.display = 'none';
+                loading.style.display = 'block';
+
+                // Fetch next page from partial endpoint
+                fetch(`/sandbox-store/partials/products?category_id={{ category.id }}&page=${nextPage}`)
+                    .then(response => response.text())
+                    .then(html => {
+                        // Append directly to grid
+                        grid.insertAdjacentHTML('beforeend', html);
+
+                        // Update state
+                        currentPage = nextPage;
+
+                        // Reset UI
+                        loading.style.display = 'none';
+                        if (currentPage < totalPages) {
+                            btn.style.display = 'inline-block';
+                        }
+                    })
+                    .catch(err => {
+                        console.error('Error loading more items:', err);
+                        loading.textContent = 'Error loading items.';
+                    });
+            });
+        }
+    });
+</script>
+{% endblock %}

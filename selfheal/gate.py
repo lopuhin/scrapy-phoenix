@@ -200,7 +200,7 @@ def check_variation(accepted: list[tuple[HeldPage, type, Any]]) -> Check:
 
 
 def check_fields(accepted: list[tuple[HeldPage, type, Any]], fixtures_dir: Path,
-                 item_cls: type) -> Check:
+                 item_cls: type, absent: dict[str, str] | None = None) -> Check:
     """The candidate must fill the fields some existing variant fills.
 
     Each existing variant of this item type has a field profile: the fields
@@ -212,7 +212,13 @@ def check_fields(accepted: list[tuple[HeldPage, type, Any]], fixtures_dir: Path,
     ``additionalProperties`` instead of ``color``), while a home page is
     compared with the home-page variant, not with category pages that share
     its item type.
+
+    The held pages are only a sample, and it may not be representative (e.g.
+    all books, which have no brand). So the candidate module may declare a field
+    absent with ``ABSENT_FIELDS = {"brand": "why"}``: the check then accepts it,
+    and the declaration is part of the reviewed diff and the report.
     """
+    absent = absent or {}
     counts: dict[str, dict[str, int]] = {}
     totals: dict[str, int] = {}
     for path in sorted(fixtures_dir.glob("*/*/output.json")):
@@ -233,13 +239,18 @@ def check_fields(accepted: list[tuple[HeldPage, type, Any]], fixtures_dir: Path,
         for name, value in _plain(item).items() if value not in (None, [], "", {})
     }
     missing = {owner: sorted(p - filled) for owner, p in profiles.items()}
-    closest = min(missing, key=lambda o: len(missing[o]))
-    ok = not missing[closest]
-    problems = [] if ok else [
-        f"closest existing variant {closest} fills {', '.join(missing[closest])}; "
-        "the candidate fills none of these on any held page"
+    closest = min(missing, key=lambda o: len(set(missing[o]) - set(absent)))
+    undeclared = [n for n in missing[closest] if n not in absent]
+    problems = [] if not undeclared else [
+        f"closest existing variant {closest} fills {', '.join(undeclared)}; "
+        "the candidate fills none of these on any held page (if no held page "
+        "shows them, declare them in ABSENT_FIELDS)"
     ]
-    return Check("fields", ok, f"field profile of {closest}", problems)
+    problems += [f"{n} is declared absent but filled on a held page"
+                 for n in sorted(set(absent) & filled)]
+    declared = [f"{n} declared absent: {absent[n]}" for n in missing[closest] if n in absent]
+    detail = "; ".join([f"field profile of {closest}"] + declared)
+    return Check("fields", not problems, detail, problems)
 
 
 def _plain(value: Any) -> Any:
@@ -315,7 +326,8 @@ def run_gate(args: argparse.Namespace) -> list[Check]:
         # completeness is guarded by the navigation item check, the progress
         # check and last-page proofs instead.
         if mine and not issubclass(item_cls, ProductNavigation):
-            checks.append(check_fields(mine, root / pkg_root / "fixtures", item_cls))
+            absent = getattr(importlib.import_module(args.candidate), "ABSENT_FIELDS", {})
+            checks.append(check_fields(mine, root / pkg_root / "fixtures", item_cls, absent))
 
     if args.save_fixtures and all(c.ok for c in checks):
         for page, cls, item in accepted:

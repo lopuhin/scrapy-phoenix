@@ -15,7 +15,7 @@ the spider hands it here instead of dropping it:
    request is re-queued, and the engine unpaused. On failure the new files
    are removed and the spider closes with ``repair_failed``.
 
-Settings: ``SELFHEAL_ENABLED``, ``SELFHEAL_MODEL`` (``gpt-5.6-luna``),
+Settings: ``SELFHEAL_ENABLED``, ``SELFHEAL_MODEL`` (``gpt-6.1-sol``),
 ``SELFHEAL_REASONING_EFFORT`` (``medium``), ``SELFHEAL_BUDGET_USD`` (3),
 ``SELFHEAL_MAX_TURNS`` (80), ``SELFHEAL_AGENT_TIMEOUT`` (seconds, 900),
 ``SELFHEAL_MAX_REPAIRS`` (6), ``SELFHEAL_HELD_PAGES`` (20),
@@ -117,7 +117,12 @@ give it a different `nextPage` (or none, if it is the last page).
    It checks: only that file was added; existing fixtures still pass; the new
    class doesn't take over other variants' fixture pages; every held page is
    extracted and passes the item checks; every class you define handles at
-   least one held page; values vary across pages.
+   least one held page; values vary across pages; the fields an existing
+   variant fills are filled here too.
+
+   The held pages are a sample. If a field the gate asks for is shown on none
+   of them (check each page), don't invent it: declare it in your module as
+   `ABSENT_FIELDS = {{"field": "what the pages show instead"}}`.
 
    Write classes only for the kinds of pages that were held. If the site has
    changed elsewhere too (e.g. listing pages you can see through the crawl),
@@ -170,7 +175,7 @@ class Healer:
         if not settings.getbool("SELFHEAL_ENABLED"):
             raise NotConfigured
         self.crawler = crawler
-        self.model = settings.get("SELFHEAL_MODEL", "gpt-5.6-luna")
+        self.model = settings.get("SELFHEAL_MODEL", "gpt-6.1-sol")
         self.reasoning_effort = settings.get("SELFHEAL_REASONING_EFFORT", "medium")
         self.budget_usd = settings.getfloat("SELFHEAL_BUDGET_USD", 3.0)
         self.max_turns = settings.getint("SELFHEAL_MAX_TURNS", 80)

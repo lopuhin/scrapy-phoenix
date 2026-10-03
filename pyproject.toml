@@ -11,7 +11,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
-agent = ["harness-run[local]>=0.4"]
+agent = ["harness-run[local] @ git+https://github.com/zytedata/harness-run.git@4028849faf48ac448b1634140cfe3a9cac8f2749"]
 test = ["pytest", "pytest-asyncio"]
 
 [build-system]

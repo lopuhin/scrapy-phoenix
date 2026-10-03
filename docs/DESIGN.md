@@ -15,7 +15,7 @@ Facts marked *(verified)* were confirmed by running code against the installed
 versions; the rest are from reading source.
 
 Versions: Scrapy 2.19.0 (asyncio reactor) · scrapy-poet 0.27.2 · web-poet 0.24.1 ·
-zyte-common-items 0.29.0 · harness-run 0.4.0 (Codex, `gpt-5.6-luna`). We may fork
+zyte-common-items 0.29.0 · harness-run 0.4.0 at main 4028849 (Codex, `gpt-6.1-sol`; earlier runs `gpt-5.6-luna`). We may fork
 web-poet or related libraries if the design needs changes there (§4.1).
 
 ---

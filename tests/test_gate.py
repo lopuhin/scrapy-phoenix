@@ -1,9 +1,12 @@
 """Gate checks that don't need a spider: scope and variation (docs/DESIGN.md §7)."""
 
+import json
 import subprocess
 from types import SimpleNamespace
 
-from selfheal.gate import check_scope, check_variation, tracked_files
+from zyte_common_items import Product
+
+from selfheal.gate import check_fields, check_scope, check_variation, tracked_files
 
 
 def _repo(tmp_path):
@@ -52,3 +55,24 @@ def test_variation_catches_a_constant_name():
     assert not check.ok and "name is the same on all 3 pages" in check.problems[0]
     assert check_variation(_accepted(["A", "B", "C"])).ok
     assert check_variation(_accepted(["Same", "Same"])).ok  # too few pages to judge
+
+
+def _fixtures(tmp_path, outputs):
+    owner = tmp_path / "sandbox_spider.variants.product_v1.ProductPageV1"
+    for i, output in enumerate(outputs):
+        (owner / str(i)).mkdir(parents=True)
+        (owner / str(i) / "output.json").write_text(json.dumps(output))
+    return tmp_path
+
+
+def test_fields_missing_unless_declared_absent(tmp_path):
+    fixtures = _fixtures(tmp_path, [{"name": "TV", "brand": "Sony"},
+                                    {"name": "Phone", "brand": "Apple"}])
+    books = [(None, None, {"name": "Book", "brand": None})]
+    check = check_fields(books, fixtures, Product)
+    assert not check.ok and "fills brand" in check.problems[0]
+    check = check_fields(books, fixtures, Product, {"brand": "books show Publisher"})
+    assert check.ok and "brand declared absent: books show Publisher" in check.detail
+    tvs = [(None, None, {"name": "TV", "brand": "Sony"})]
+    check = check_fields(tvs, fixtures, Product, {"brand": "nope"})
+    assert check.problems == ["brand is declared absent but filled on a held page"]

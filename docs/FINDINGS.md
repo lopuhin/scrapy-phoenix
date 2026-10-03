@@ -3,7 +3,7 @@
 Evidence gathered while building, for the design and the talk. The summary
 lists what still stands; the dated log below it keeps the details, newest first.
 
-## Summary (as of 2026-10-03, end of step 1)
+## Summary (as of 2026-10-03, step 1 and the step-2 spike)
 
 Step 1 built the detection side on four spiders: three layouts of the sandbox
 store and books.toscrape.com. Every spider extracts everything correctly on its
@@ -76,17 +76,82 @@ extracted fully correctly or refused. **No bad item was delivered.**
 13. **scrapy-poet isn't used at all.** Plain web-poet page objects built by hand
     are enough.
 
-### Still unverified (step 2 spike)
+### Agent inside the crawl (step 2 spike)
 
-- A harness-run Codex session awaited inside the crawl's event loop without
-  blocking it (the load-bearing assumption).
-- scrapy-mcp reaching Remote Control from inside Codex's sandbox.
+14. **The repair agent can run inside the paused crawl without stalling it.**
+    A harness-run Codex session awaited as a task on the crawl's event loop never
+    delayed the loop by more than 2.4 ms over about 40 s. Remote Control answered
+    in under 2 ms throughout. Pausing stops only new requests: responses already
+    in flight are still parsed and yield items. Re-queuing the held page and
+    unpausing finishes the same run with 566/566 items.
+15. **The agent needs two Codex settings beyond `acceptEdits`.** Codex's
+    sandbox blocks scrapy-mcp `execute` calls unless that server's tools are
+    approved (`mcp_servers.<name>.default_tools_approval_mode = "approve"`).
+    Read-only tools such as `list_jobs` work without it. The scrapy-mcp server
+    itself runs outside the sandbox, so it reaches Remote Control on localhost.
+    The agent's own shell has no network, not even to localhost. A `curl` to the
+    sandbox site works only with `sandbox_workspace_write.network_access`.
+    Writes outside the project fail with "Read-only file system".
+
+### Still unverified
+
 - `CLOSESPIDER_*` timeouts during a long pause.
 - Dedup stability after a hot-swap.
-- harness-run defaults to no sandbox (`bypassPermissions`); we plan to override it
-  with `acceptEdits`.
+- Whether the agent needs shell network access at all, or whether fetching
+  pages through the crawl via scrapy-mcp is enough.
 
 # Log
+
+## 2026-10-03 — step 2 spike: agent inside a paused crawl
+
+`scripts/spike_pause.py` crawls the sandbox store in its default layout. After
+20 products, it holds the next product page as if no variant recognised it,
+calls `engine.pause()`, and starts a harness-run Codex session (`gpt-5.6-luna`,
+`acceptEdits`, scrapy-mcp via `uvx`) as a task on the crawl's loop. The prompt is
+a plumbing test with no repair. The agent is asked to find the job through
+scrapy-mcp, run a snippet in it, `curl` the sandbox, write a file in the
+workspace, write one outside it, and sleep 20 s. Afterwards the held request is
+re-queued with `dont_filter=True` and the engine is unpaused.
+
+The crawl side was the same in all three runs:
+
+- A heartbeat task measured event-loop lag every 0.5 s while paused (75–81
+  samples per run). The maximum lag was 2.4 ms, so the session doesn't block
+  the loop.
+- Our own `GET /status` to Remote Control during the pause returned 200 every
+  time, in at most 1.5 ms.
+- In-flight requests drained after the pause and their callbacks ran: 15–20
+  product callbacks, and items went from about 24 to about 40 while paused. The
+  scheduler held 267–283 requests untouched.
+- The agent session took 38–41 s, cost about $0.01 and used 6 turns.
+- Resume: the crawl finished with 566/566 items (`finished`), including the held
+  page.
+- One setup step: `local.deploy` with Codex needs the `openai-codex` SDK, i.e.
+  `harness-run[local]` (our `agent` extra). Without it the run fails at once
+  and the crawl resumes, which shows the failure path works too.
+
+What the agent could do depended on `codex_config`:
+
+| run | codex_config | scrapy-mcp `list_jobs` | scrapy-mcp `execute` | shell `curl` 127.0.0.1:8765 | write in project | write in `~` |
+|---|---|---|---|---|---|---|
+| 1 | none | ok | blocked ("approval policy is never") | refused (exit 7) | ok | Read-only file system |
+| 2 | `default_tools_approval_mode=approve` + `network_access` | ok | ok | 200 | ok | Read-only file system |
+| 3 | `default_tools_approval_mode=approve` | ok | ok | refused (exit 7) | ok | Read-only file system |
+
+In runs 2 and 3, the agent's snippet saw the live state: `paused=True`, the
+scheduler size, the item count and the held URL. Its second snippet, 20 s
+later, printed the same values, so nothing moved during the pause.
+
+Consequences for the design:
+
+- `acceptEdits` is usable as planned. Add
+  `mcp_servers.scrapy.default_tools_approval_mode = "approve"` to the spec's
+  `codex_config`.
+- Shell network access is off by default. Repairs should first try working
+  from held pages and from fetches made through the crawl via scrapy-mcp. Turn
+  network on only if that turns out to be too limiting.
+- `execute` approval is per-server, so it covers every snippet the agent sends.
+  A read-only mode for scrapy-mcp would be the place to restrict that.
 
 ## 2026-10-03 — review follow-ups
 

@@ -324,12 +324,14 @@ prompt in phase 0; a read-only scrapy-mcp mode is possible hardening.
   scrapy-mcp, but it can't write to `~/.ssh`, `~/.local`, other repos, or reach the
   internet from its shell.
 
-  Two things to confirm in the spike (§10):
-  - that the scrapy-mcp server, which Codex launches as its own process rather than
-    through the command sandbox, can reach Remote Control on localhost;
-  - whether the agent needs shell network access at all (e.g. `curl` to the sandbox
-    site). If it does, we enable it via
-    `codex_config={"sandbox_workspace_write.network_access": True}`.
+  Confirmed in the spike (§10, FINDINGS 2026-10-03):
+  - the scrapy-mcp server runs outside the command sandbox and reaches Remote
+    Control on localhost, but Codex blocks its `execute` tool under `acceptEdits`
+    unless `codex_config` sets `mcp_servers.scrapy.default_tools_approval_mode = "approve"`;
+  - the agent's shell has no network at all, localhost included, so a `curl` to
+    the sandbox site needs `sandbox_workspace_write.network_access`. We start
+    without it: held pages and fetches through the crawl via scrapy-mcp should
+    be enough.
 
   Scope rules such as "only `variants/`" are enforced by the gate, not the sandbox:
   the sandbox boundary is the whole project root. If this turns out to be friction,
@@ -443,11 +445,12 @@ is to find gaps in the detection model while they are cheap to fix.
 
 **Step 2: the loop.**
 
-4. Spike: from a callback, `pause()` → a background-task `session.run()` (Codex,
-   trivial prompt, with scrapy-mcp attached, `acceptEdits`). Confirm:
+4. Spike (done, `scripts/spike_pause.py`): from a callback, `pause()` → a
+   background-task `session.run()` (Codex, trivial prompt, with scrapy-mcp
+   attached, `acceptEdits`). Confirmed:
    - Remote Control stays responsive;
    - in-flight callbacks proceed;
-   - scrapy-mcp works from inside the Codex sandbox;
+   - scrapy-mcp works from inside the Codex sandbox (once its tools are approved);
    - `engine.crawl` + `unpause()` resumes.
 5. Healer + gate + hot-load; Case A end to end (full swap, then ratio 0.5 mixed).
 6. Case C: add the `no_price` sandbox layout; scripted rejection, report, non-zero

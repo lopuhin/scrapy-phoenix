@@ -1,6 +1,92 @@
-# Findings log
+# Findings
 
-Evidence gathered while building, for the design and the talk. Newest first.
+Evidence gathered while building, for the design and the talk. The summary
+lists what still stands; the dated log below it keeps the details, newest first.
+
+## Summary (as of 2026-10-03, end of step 1)
+
+Step 1 built the detection side on four spiders: three layouts of the sandbox
+store and books.toscrape.com. Every spider extracts everything correctly on its
+own site: 566/566 products against the sandbox's ground truth, and 1000/1000
+books. Across 24 crawls (3 sandbox spiders × 8 layouts), every page was either
+extracted fully correctly or refused. **No bad item was delivered.**
+
+### Detection
+
+1. **A redesign of the home page or navigation stops the crawl at the first
+   page.** Under the `modern` layout, the default spider sees only the home page,
+   refuses it, and has nothing else to visit. The repair loop will start with a
+   single held page, so it must work in stages: repair navigation, resume, reach
+   the product pages, refuse them, repair again.
+2. **Content marked `may` can drift unnoticed on each page.** A category page
+   that keeps its products but silently loses its subcategories passes. The
+   dead-end check catches only pages that lose everything. Catching the rest needs
+   state from outside the page (e.g. per-URL counts from a reference run), which
+   makes it the first concrete reason to add external state.
+3. **Strictness is a choice the author makes, and it cuts both ways.** Anchors
+   that no extraction used caused refusals on harmless drift: the scroll spider
+   refused the load-more layout only because of the scroll trigger it never read.
+   With those anchors removed it crawls load-more fully correctly. But "only
+   `must` what you extract with" also lets a variant accept a page of the wrong
+   type. `tests/test_routing.py` guards against that offline, and the validation
+   gate will need the same check for new variants.
+4. **The variant picked to explain a refusal can be wrong on home pages.**
+   Refusals are ranked by how much of the page each variant did extract, which
+   names the right variant on category and product pages. On a home page the
+   category variant extracts more than the home variant does, and this evidence
+   feeds the agent's prompt.
+5. **Blind pagination works, at a cost.** The scroll spider probes `?page=N+1`
+   until a page comes back empty, which costs one extra request per listing.
+   A next page repeating the previous page's products is refused, which is how a
+   site that ignores the page parameter gets caught. A site that answers past the
+   end with an error page we haven't seen would show up as a refusal.
+6. **Detection covers only what the spider extracts.** The `variant-dom-change`
+   layout (only the product-variant picker changes) is not detected. That's
+   correct, since variants are out of scope, but it's a reminder.
+7. **Proving "this is the last page" is possible in every site shape we met:**
+   a pagination widget that is always rendered (sandbox default), a page label or
+   result count (sandbox modern, books.toscrape.com), or probing (sandbox scroll).
+   The undetectable case is a site with none of these whose spider doesn't probe.
+   There, only a comparison with a previous run helps, and in-process detection
+   is weaker than aggregate monitoring.
+8. **Evidence is precise enough to paste into a prompt**, e.g.
+   `ProductPageV1.price [extract]: '.product-info .price-tag' matched nothing`.
+   The `hidden-price` layout fires only on the price and currency fields.
+
+### Test setup
+
+9. **The "unfixable" case isn't unfixable yet.** `hidden-price` removes the
+   price from product pages, but it is still in the listing cards and at
+   `/partials/price/{id}`. A truly unfixable case needs a new `no_price` sandbox
+   layout. The layout case (A) uses the sandbox's A/B setting to switch only
+   product pages, and a ratio of 0.5 serves both layouts at once.
+10. **The default catalogue has no single-page categories.** That fixture is
+    captured with `ITEMS_PER_PAGE=20`. Fixtures embed `127.0.0.1:8765` URLs, and
+    regenerating them rewrites timestamps, which shows up as diff noise.
+
+### Code
+
+11. **web-poet's "coroutine never awaited" warnings are silenced
+    process-wide.** web-poet creates every field coroutine before awaiting any, so
+    a field raising inside `to_item()` leaks the rest. The filter also matches
+    such a warning from a real bug of ours; a web-poet fork could fix the cause.
+12. **Some coupling between spiders remains.** The scroll spider's product and
+    home variants subclass the default spider's, and the modern and scroll
+    spiders import `sandbox_spider.items`.
+13. **scrapy-poet isn't used at all.** Plain web-poet page objects built by hand
+    are enough.
+
+### Still unverified (step 2 spike)
+
+- A harness-run Codex session awaited inside the crawl's event loop without
+  blocking it (the load-bearing assumption).
+- scrapy-mcp reaching Remote Control from inside Codex's sandbox.
+- `CLOSESPIDER_*` timeouts during a long pause.
+- Dedup stability after a hot-swap.
+- harness-run defaults to no sandbox (`bypassPermissions`); we plan to override it
+  with `acceptEdits`.
+
+# Log
 
 ## 2026-10-03 — review follow-ups
 

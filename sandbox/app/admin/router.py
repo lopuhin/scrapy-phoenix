@@ -99,6 +99,7 @@ async def update_settings(
     DATA_GENERATION_SEED: int = Form(...),
     ITEMS_PER_PAGE: int = Form(...),
     BOOKS_COUNT_SCALE: float = Form(1.0),
+    PRICE_SCALE: float = Form(1.0),
 ):
     # Update settings
     settings.ACTIVE_LAYOUT = ACTIVE_LAYOUT
@@ -118,6 +119,7 @@ async def update_settings(
     settings.HAS_RATING_SEED = HAS_RATING_SEED
     settings.PRODUCT_COUNT_SCALE = PRODUCT_COUNT_SCALE
     settings.BOOKS_COUNT_SCALE = BOOKS_COUNT_SCALE
+    settings.PRICE_SCALE = PRICE_SCALE
     settings.DATA_GENERATION_SEED = DATA_GENERATION_SEED
     settings.ITEMS_PER_PAGE = ITEMS_PER_PAGE
 

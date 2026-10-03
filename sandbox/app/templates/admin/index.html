@@ -238,6 +238,10 @@
                             <input type="number" step="0.1" id="BOOKS_COUNT_SCALE" name="BOOKS_COUNT_SCALE" value="{{ settings['BOOKS_COUNT_SCALE'] }}" class="{% if settings['BOOKS_COUNT_SCALE'] != defaults['BOOKS_COUNT_SCALE'] %}modified-input{% endif %}">
                         </div>
                         <div class="form-group">
+                            <label for="PRICE_SCALE">Price Scale (1.13 = all prices up 13%; ids, names and attributes unchanged)</label>
+                            <input type="number" step="0.01" id="PRICE_SCALE" name="PRICE_SCALE" value="{{ settings['PRICE_SCALE'] }}" class="{% if settings['PRICE_SCALE'] != defaults['PRICE_SCALE'] %}modified-input{% endif %}">
+                        </div>
+                        <div class="form-group">
                             <label for="DATA_GENERATION_SEED">Global Data Seed</label>
                             <input type="number" id="DATA_GENERATION_SEED" name="DATA_GENERATION_SEED" value="{{ settings['DATA_GENERATION_SEED'] }}" class="{% if settings['DATA_GENERATION_SEED'] != defaults['DATA_GENERATION_SEED'] %}modified-input{% endif %}">
                         </div>

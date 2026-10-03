@@ -56,6 +56,11 @@ class Settings(BaseSettings):
     # tests (a break no layout knob can produce).
     BOOKS_COUNT_SCALE: float = 1.0
 
+    # Multiply every generated price (1.0 = unchanged, 1.13 = prices up 13%).
+    # Changes values without touching the random sequence, so products keep
+    # their ids, names and attributes: the "prices changed" lever.
+    PRICE_SCALE: float = 1.0
+
     # Base seed for data generation
     DATA_GENERATION_SEED: int = 42
 

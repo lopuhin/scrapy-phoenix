@@ -17,13 +17,22 @@ import urllib.request
 from parsel import Selector
 
 PRESETS: dict[str, dict[str, str]] = {
-    "default": {"ACTIVE_LAYOUT": "layout_default", "AB_TEST_RATIO": "0.0", "ITEMS_PER_PAGE": "12"},
+    "default": {"ACTIVE_LAYOUT": "layout_default", "AB_TEST_RATIO": "0.0", "ITEMS_PER_PAGE": "12",
+                "PRICE_SCALE": "1.0"},
     # Case A: product pages switch to the "modern" design, listings unchanged.
     "product-modern": {
         "ACTIVE_LAYOUT": "layout_default",
         "AB_TEST_TARGET": "products",
         "AB_TEST_LAYOUT": "layout_modern",
         "AB_TEST_RATIO": "1.0",
+    },
+    # Case A while every price went up 13%: the fixtures' values are stale.
+    "product-modern-repriced": {
+        "ACTIVE_LAYOUT": "layout_default",
+        "AB_TEST_TARGET": "products",
+        "AB_TEST_LAYOUT": "layout_modern",
+        "AB_TEST_RATIO": "1.0",
+        "PRICE_SCALE": "1.13",
     },
     # Case A, half the products: both variants must coexist.
     "product-modern-half": {

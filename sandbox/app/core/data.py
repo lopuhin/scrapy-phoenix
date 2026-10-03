@@ -236,7 +236,7 @@ class DataManager:
                 sub_cat_singular = base_noun
                 name = f"{prefix} {adjective} {base_noun}"
 
-            price = round(gen_random.uniform(price_min, price_max), 2)
+            price = round(gen_random.uniform(price_min, price_max) * settings.PRICE_SCALE, 2)
             original_price = None
 
             # Generate Rating Logic (Seeded)

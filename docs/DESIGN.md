@@ -310,7 +310,11 @@ prompt in phase 0; a read-only scrapy-mcp mode is possible hardening.
   Now the healer builds a temp workspace from a single commit with no history. It
   holds the repaired spider's own package, `selfheal/`, `scrapy.cfg`,
   `pyproject.toml`, `.gitignore` and `LICENSE`, plus `.selfheal/held/` and a
-  `.selfheal/python` wrapper. The scope check runs there against that commit. Only
+  `.selfheal/python` wrapper. A spider that builds on another package (shared
+  item checks, variants subclassing another spider's) also gets the project
+  packages its package imports; sibling spiders it doesn't import stay out. The
+  prompt's README and items paths are where the spider's item checks live. The
+  scope check runs there against that commit. Only
   the new module is copied into the live tree, where the healer runs the rest of
   the gate. Rollback deletes that one file. The workspace is roughly what a
   deployed project looks like, for example on Scrapy Cloud. Reads outside it
@@ -410,7 +414,11 @@ As built:
     pages must cover the closest existing variant's profile, which is the
     fields it fills on at least half of its fixtures. This catches a variant
     that silently drops a field. Navigation pages differ in shape by design,
-    so the navigation checks cover them instead.
+    so the navigation checks cover them instead. The held pages are a sample
+    and may not be representative (one Case A run held 18 books, which have no
+    brand), so the module may declare `ABSENT_FIELDS = {"brand": "why"}`; the
+    check accepts declared fields, refuses a declared field that is filled,
+    and the declaration shows in the diff and `gate.json`.
 - A held page with `bad_next` (the previous page of a progress refusal,
   downloaded again by the healer) must be accepted with a different
   `nextPage`.
@@ -529,3 +537,62 @@ is to find gaps in the detection model while they are cheap to fix.
   on "empty page" and "repeated page" being distinguishable on the site.
 - Codex strict structured output may reject optional fields, so the schemas are
   all-required.
+
+## 13. Assumptions
+
+The design doesn't handle everything; these are the assumptions it does make,
+so they can be checked against a real site.
+
+- **Values change; layouts are what we check.** Nothing compares a value on a
+  held page with a value in a fixture. Fixtures are saved HTML with the output
+  extracted from it, so regression and routing stay valid when prices move.
+  Tested: Case A with every price up 13% (`product-modern-repriced`) heals with
+  all fields correct against the new prices.
+- **The site holds still during one repair.** See "Mid-crawl changes" below.
+- **Listing page numbers go up by one.** When two consecutive listing pages
+  both have a `pageNumber`, the second must be the first plus one; a page whose
+  items all repeat the previous page's is refused too. A site that numbers by
+  offset would need a different check.
+- **`nextPage` is not deduplicated, so loops rely on the progress check.** A
+  back link to an earlier page is refused via its page number. Without page
+  numbers, only a loop of length one (same items as the page before) is caught;
+  a longer cycle on such a site would run until a crawl limit.
+- **Fixtures are representative of each existing variant.** The `fields` check
+  uses their majority profile; the held pages may not be representative,
+  which is what `ABSENT_FIELDS` is for.
+- **Held pages of a kind are representative of that kind.** Kinds that weren't
+  held get no code; they are held and repaired when the crawl reaches them.
+- **The agent's workspace is what a deployment would contain.** It hides the
+  test site and sibling spiders the repaired one doesn't import. In a real
+  project a sibling spider for the same site might be legitimate help; here
+  hiding it keeps the test honest (no answer already in the repo).
+- **Variants read only the response** (D1). A field the HTML doesn't contain
+  can't be repaired, and the agent should give up (Case C).
+
+### Mid-crawl changes (described, not built)
+
+If the site changes values (e.g. prices) while the crawl is paused, items from
+before and after the pause carry different values, each correct when it was
+fetched. Held pages are downloaded again at resume (D6), so their items carry
+the current values; the gate ran on the saved bodies, which only had to show
+the layout. Scoring such a run needs ground truth from before and after the
+pause, accepting either value per item. If the *layout* changes again during
+the pause, the re-downloaded pages are refused and held, and the next repair
+starts like any other.
+
+## 14. Out of scope (mention only)
+
+- **Blocked pages** (403, CAPTCHAs): not a layout change, and the sandbox has
+  no way around a ban to repair towards. Today they'd be refused or fail as
+  downloads; the right repair is in the download layer, not a page object.
+- **Extra requests in page objects** (web-poet `HttpClient`): would make Case C
+  repairable for `hidden_price`, where the price comes from an XHR. Possible via
+  `build_page` (D1), deliberately left for later.
+- **Real spider changes** (callbacks, new request types): a page object can't
+  add them. The way to do it is stop, change the spider, and restart with
+  `JOBDIR` so the crawl continues from where it was; the in-process loop stops
+  at the page-object boundary.
+- **Saving repairs back to the repo**: the repair record holds the module and
+  fixtures; turning that into a PR for a human to review is the obvious next
+  step, not needed to show the loop.
+

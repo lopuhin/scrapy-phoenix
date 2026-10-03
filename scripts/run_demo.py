@@ -45,9 +45,14 @@ def main() -> int:
     parser.add_argument("-s", dest="settings", action="append", default=[])
     args = parser.parse_args()
 
-    spider_cls = SpiderLoader.from_settings(get_project_settings()).load(args.spider)
-    variants_dir = spider_cls.variants_package.replace(".", "/")
-    leftovers = untracked_variants(variants_dir)
+    loader = SpiderLoader.from_settings(get_project_settings())
+    spider_cls = loader.load(args.spider)
+    # Every spider's, not just this one's: a spider's workspace also carries
+    # the packages it imports, so another spider's leftover would be visible.
+    leftovers = [path for name in loader.list()
+                 for path in untracked_variants(
+                     loader.load(name).variants_package.replace(".", "/"))]
+    leftovers = sorted(set(leftovers))
     if leftovers and not args.reset:
         print(f"untracked variant modules from earlier runs: {leftovers}; use --reset")
         return 2

@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     PROJECT_NAME: str = "Zyte Monitoring Sandbox"
 
     # Layout configuration
-    # Options: "layout_default", "layout_modern", "layout_load_more", "layout_infinite_scroll", "layout_variant_dom_change", "layout_hidden_price"
+    # Options: "layout_default", "layout_modern", "layout_load_more", "layout_infinite_scroll", "layout_variant_dom_change", "layout_hidden_price", "layout_no_price"
     ACTIVE_LAYOUT: str = "layout_default"
 
     # A/B Testing Configuration

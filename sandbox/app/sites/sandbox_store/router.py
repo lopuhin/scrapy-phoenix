@@ -202,6 +202,10 @@ async def get_product_price(product_id: str):
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
 
+    # layout_no_price: prices are for signed-in members only, here too.
+    if get_layout(product_id, "products") == "layout_no_price":
+        raise HTTPException(status_code=401, detail="Sign in to see prices")
+
     return {
         "id": product.id,
         "price": product.price,

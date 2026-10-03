@@ -28,10 +28,11 @@ import asyncio
 import difflib
 import json
 import logging
-import os
 import re
+import shutil
 import subprocess
 import sys
+import tempfile
 import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -46,7 +47,7 @@ from scrapy.http import Response
 from web_poet.utils import get_fq_class_name
 
 from .dispatch import Unrecognized
-from .gate import save_held, tracked_files
+from .gate import changed_files, check_scope, save_held, tracked_files
 
 logger = logging.getLogger(__name__)
 
@@ -115,8 +116,10 @@ Item type: `{item_type}`. Held pages (body + JSON with URL and evidence) are in
 3. Look at the extracted items yourself too: are they *right*, per the README?
    Passing checks is necessary, not sufficient.
 
-The live crawl is reachable through the scrapy-mcp tools (job pid {pid}); you
-may inspect it, but do not change its state: the healer loads your module.
+The live crawl is reachable through the scrapy-mcp tools (`job_id`: `{job_id}`).
+You may inspect it and fetch pages through it (e.g. `await
+crawler.engine.download_async(Request(url))`), but do not change its state: the
+healer loads your module.
 Your shell has no network access.
 
 If the pages cannot be extracted in a way that meets the intent (e.g. data the
@@ -139,6 +142,7 @@ class Repair:
     saved: int = 0
     trigger: dict[str, Any] = field(default_factory=dict)
     task: asyncio.Task | None = None
+    installed: Path | None = None  # the module copied into the live tree
     metrics: dict[str, Any] = field(default_factory=dict)
 
 
@@ -224,22 +228,22 @@ class Healer:
         m["trigger"] = repair.trigger
         try:
             await self._drain()
-            baseline = tracked_files(ROOT)
-            (repair.dir / "baseline.json").write_text(json.dumps(baseline))
             module = self._next_module(repair.item_cls)
-            gate_cmd = self._gate_cmd(repair, module)
-            prompt = self._prompt(repair, module, gate_cmd)
+            module_file = module.replace(".", "/") + ".py"
+            workspace = self._workspace(repair)
+            prompt = self._prompt(repair, module, self._gate_cmd(
+                module, ".selfheal", python=".selfheal/python", baseline=True))
             (repair.dir / "prompt.md").write_text(prompt)
             m["pages_held_at_start"] = repair.saved
 
             proposal, gate = None, None
-            async with self._agent(repair) as agent:
+            async with self._agent(repair, workspace) as agent:
                 message = prompt
                 for attempt in (1, 2):
                     proposal = await agent.turn(message)
                     if proposal is None or proposal.kind == "give_up":
                         break
-                    gate = await self._run_gate(repair, gate_cmd, final=True)
+                    gate = await self._check(repair, workspace, module)
                     m[f"gate_attempt_{attempt}"] = gate["ok"]
                     if gate["ok"]:
                         break
@@ -249,11 +253,12 @@ class Healer:
                         + "\n```\nFix the module (same file) and run the gate again."
                     )
                 m |= agent.totals()
+            m["diff_lines"] = self._write_diff(repair, workspace)
+            shutil.rmtree(workspace.parent, ignore_errors=True)
 
             (repair.dir / "proposal.json").write_text(
                 proposal.model_dump_json(indent=1) if proposal else "null"
             )
-            m["diff_lines"] = self._write_diff(repair, baseline)
             if proposal is None:
                 return self._fail(repair, "agent returned no proposal")
             if proposal.kind == "give_up":
@@ -290,11 +295,45 @@ class Healer:
                  for n in re.findall(rf"^{prefix}_v(\d+)", p.stem)]
         return f"{package}.{prefix}_v{max(taken, default=0) + 1}"
 
-    def _gate_cmd(self, repair: Repair, module: str, json_out: str | None = None) -> str:
-        rel = repair.dir.relative_to(ROOT)
-        cmd = (f"{_python()} -m selfheal.gate --spider {self.spider.name} --candidate {module} "
-               f"--held {rel}/held --baseline {rel}/baseline.json")
-        return cmd + (f" --json {json_out}" if json_out else "")
+    def _gate_cmd(self, module: str, record_dir: str, python: str = sys.executable,
+                  baseline: bool = False) -> str:
+        cmd = (f"{python} -m selfheal.gate --spider {self.spider.name} "
+               f"--candidate {module} --held {record_dir}/held")
+        return cmd + (f" --baseline {record_dir}/baseline.json" if baseline else "")
+
+    def _workspace(self, repair: Repair) -> Path:
+        """A clean copy of the project for the agent: one commit, no history.
+
+        The agent works here, not in the live tree, and sees what a deployment
+        of this one spider would contain: the spider's own package, the
+        ``selfheal`` framework, the top-level project files and this repair's
+        held pages. Other spiders, the test site's source, notes, scripts and
+        earlier repairs' records stay out of sight.
+        """
+        package = self.spider.variants_package.split(".")[0]
+        keep = (f"{package}/", "selfheal/")
+        root = Path(tempfile.mkdtemp(prefix=f"selfheal-{repair.id}-")) / "project"
+        for rel in tracked_files(ROOT):
+            if "/" in rel and not rel.startswith(keep):
+                continue
+            target = root / rel
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(ROOT / rel, target)
+        with (root / ".gitignore").open("a") as f:
+            f.write("\n.selfheal/\n")
+        git = ["git", "-c", "user.name=selfheal", "-c", "user.email=selfheal@localhost"]
+        subprocess.run([*git, "init", "-q"], cwd=root, check=True)
+        subprocess.run([*git, "add", "-A"], cwd=root, check=True)
+        subprocess.run([*git, "commit", "-qm", "snapshot"], cwd=root, check=True)
+        shutil.copytree(repair.dir / "held", root / ".selfheal" / "held")
+        (root / ".selfheal" / "baseline.json").write_text(json.dumps(tracked_files(root)))
+        # The crawl's interpreter, without putting the live project's path in the
+        # prompt (an agent shown that path tends to search it).
+        python = root / ".selfheal" / "python"
+        python.write_text(f'#!/bin/sh\nexec {sys.executable} "$@"\n')
+        python.chmod(0o755)
+        repair.metrics["workspace_files"] = len(tracked_files(root))
+        return root
 
     def _prompt(self, repair: Repair, module: str, gate_cmd: str) -> str:
         package = self.spider.variants_package
@@ -306,24 +345,43 @@ class Healer:
             readme=f"{pkg_root}/README.md",
             items=f"{pkg_root}/items.py",
             item_type=get_fq_class_name(repair.item_cls),
-            held=repair.dir.relative_to(ROOT) / "held",
+            held=".selfheal/held",
             evidence=evidence["evidence"],
             variants_dir=package.replace(".", "/"),
             module=module,
             module_file=module.replace(".", "/") + ".py",
             gate_cmd=gate_cmd,
-            pid=os.getpid(),
+            job_id=self._job_id(),
         )
 
-    def _agent(self, repair: Repair) -> _AgentSession:
-        return _AgentSession(self, repair)
+    def _agent(self, repair: Repair, workspace: Path) -> _AgentSession:
+        return _AgentSession(self, repair, workspace)
 
-    async def _run_gate(self, repair: Repair, gate_cmd: str, final: bool) -> dict:
+    async def _check(self, repair: Repair, workspace: Path, module: str) -> dict:
+        """Scope in the agent's workspace, then the gate in the live tree.
+
+        The workspace started as one commit, so its scope check sees exactly
+        what the agent changed. Only the new module is then copied into the
+        live tree, where the rest of the gate runs against the real project.
+        """
+        package_dir = self.spider.variants_package.replace(".", "/")
+        module_file = module.replace(".", "/") + ".py"
+        baseline = json.loads((workspace / ".selfheal" / "baseline.json").read_text())
+        scope = check_scope(workspace, baseline, package_dir, module_file)
+        if not scope.ok:
+            output = "FAIL scope:\n" + "\n".join(f"     - {p}" for p in scope.problems)
+            return {"ok": False, "output": output + "\nGATE FAILED"}
+        repair.installed = ROOT / module_file
+        repair.installed.write_bytes((workspace / module_file).read_bytes())
+        gate = await self._run_gate(repair, module)
+        gate["output"] = f"PASS scope: {scope.detail}\n" + gate["output"]
+        return gate
+
+    async def _run_gate(self, repair: Repair, module: str) -> dict:
+        """The healer's own gate run, in the live tree, on the module copied there."""
         rel = repair.dir.relative_to(ROOT)
-        cmd = gate_cmd.split()[1:]  # drop "python": use our interpreter
-        cmd += ["--json", f"{rel}/gate.json"]
-        if final:
-            cmd += ["--save-fixtures", f"{rel}/fixtures"]
+        cmd = self._gate_cmd(module, str(rel)).split()[1:]
+        cmd += ["--json", f"{rel}/gate.json", "--save-fixtures", f"{rel}/fixtures"]
         started = time.monotonic()
         proc = await asyncio.create_subprocess_exec(
             sys.executable, *cmd, cwd=ROOT,
@@ -336,15 +394,13 @@ class Healer:
                     result["output"])
         return result
 
-    def _write_diff(self, repair: Repair, baseline: dict[str, str]) -> int:
-        from .gate import changed_files
-
-        added, changed = changed_files(ROOT, baseline)
+    def _write_diff(self, repair: Repair, workspace: Path) -> int:
+        """What the agent changed in its workspace, as a patch."""
+        baseline = json.loads((workspace / ".selfheal" / "baseline.json").read_text())
+        added, changed = changed_files(workspace, baseline)
         chunks = []
         for rel in added:
-            if rel.startswith(str(self.repairs_dir.relative_to(ROOT))):
-                continue
-            text = (ROOT / rel).read_text(errors="replace").splitlines(keepends=True)
+            text = (workspace / rel).read_text(errors="replace").splitlines(keepends=True)
             chunks += difflib.unified_diff([], text, "/dev/null", f"b/{rel}")
         chunks += [f"# modified or deleted (not shown): {rel}\n" for rel in changed]
         (repair.dir / "diff.patch").write_text("".join(chunks))
@@ -376,13 +432,20 @@ class Healer:
                        self.spider.variants.describe())
         return loaded
 
-    def _job_file(self) -> dict:
+    def _job_path(self) -> Path:
         from scrapy.extensions.remote_control import RemoteControl
 
         for ext in self.crawler.extensions.middlewares:
             if isinstance(ext, RemoteControl) and ext._job_file_path:
-                return json.loads(ext._job_file_path.read_text())
+                return ext._job_file_path
         raise RuntimeError("Remote Control is not running (REMOTE_CONTROL_ENABLED?)")
+
+    def _job_file(self) -> dict:
+        return json.loads(self._job_path().read_text())
+
+    def _job_id(self) -> str:
+        """scrapy-mcp's job id is the job file's name without ``.json``."""
+        return self._job_path().stem
 
     def _resume(self, repair: Repair, outcome: str) -> None:
         engine = self.crawler.engine
@@ -420,10 +483,7 @@ class Healer:
         self.failed = True
         logger.error("selfheal: repair failed: %s", reason)
         if repair is not None:
-            baseline = json.loads((repair.dir / "baseline.json").read_text()) \
-                if (repair.dir / "baseline.json").exists() else None
-            if baseline is not None:
-                self._rollback(baseline)
+            self._rollback(repair)
             repair.metrics["outcome"] = "failed"
             repair.metrics["reason"] = reason
             repair.metrics["paused_s"] = round(time.monotonic() - repair.started, 1)
@@ -433,19 +493,11 @@ class Healer:
         self.crawler.engine.unpause()
         asyncio.create_task(self.crawler.engine.close_spider_async(reason="repair_failed"))
 
-    def _rollback(self, baseline: dict[str, str]) -> None:
-        """Remove files the agent added; restore tracked files it changed."""
-        from .gate import changed_files
-
-        added, changed = changed_files(ROOT, baseline)
-        repairs_rel = str(self.repairs_dir.relative_to(ROOT))
-        for rel in added:
-            if not rel.startswith(repairs_rel):
-                (ROOT / rel).unlink(missing_ok=True)
-                logger.warning("selfheal: rolled back %s", rel)
-        if changed:
-            subprocess.run(["git", "checkout", "--", *changed], cwd=ROOT, check=False)
-            logger.warning("selfheal: restored %s", changed)
+    def _rollback(self, repair: Repair) -> None:
+        """Remove the module copied into the live tree; nothing else was touched there."""
+        if repair.installed is not None and repair.installed.exists():
+            repair.installed.unlink()
+            logger.warning("selfheal: rolled back %s", repair.installed.relative_to(ROOT))
 
     def _report(self, repair: Repair, reason: str) -> str:
         proposal = repair.dir / "proposal.json"
@@ -480,9 +532,7 @@ class Healer:
             # e.g. CLOSESPIDER_TIMEOUT fired mid-repair: stop the agent, undo its files.
             logger.error("selfheal: spider closed (%s) during repair %s", reason, repair.id)
             repair.task.cancel()
-            baseline = repair.dir / "baseline.json"
-            if baseline.exists():
-                self._rollback(json.loads(baseline.read_text()))
+            self._rollback(repair)
             repair.metrics |= {"outcome": "interrupted", "reason": reason}
             self._record(repair)
         self.crawler.stats.set_value("selfheal/repairs", len(self.repairs))
@@ -491,9 +541,14 @@ class Healer:
 class _AgentSession:
     """One harness-run Codex session per repair; ``turn()`` runs one message."""
 
-    def __init__(self, healer: Healer, repair: Repair) -> None:
+    def __init__(self, healer: Healer, repair: Repair, workspace: Path) -> None:
         self.healer = healer
         self.repair = repair
+        self.workspace = workspace
+        # Commands that name the live project (other than its venv) look outside
+        # the workspace; counted for the record, not blocked.
+        self.outside = re.compile(re.escape(str(ROOT)) + r"/(?!\.venv/)")
+        self.outside_refs: list[str] = []
         self.events = (repair.dir / "events.jsonl").open("w")
         self.cost = 0.0
         self.turns = 0
@@ -519,7 +574,7 @@ class _AgentSession:
                 "scrapy", "uvx", ["--from", "scrapy-mcp-official", "scrapy-mcp"])],
             codex_config={"mcp_servers.scrapy.default_tools_approval_mode": "approve"},
         )
-        engine = local.deploy(spec, workspace=str(ROOT),
+        engine = local.deploy(spec, workspace=str(self.workspace),
                               workdir=str(h.repairs_dir / ".harness"))
         self.session = engine.start_session()
         return self
@@ -552,11 +607,16 @@ class _AgentSession:
 
     async def _stream(self, run) -> None:
         async for event in run:
-            self._event(event.kind, event.summary or "")
+            self._event(event.kind, event.summary or "", event.raw)
 
-    def _event(self, kind: str, summary: str) -> None:
+    def _event(self, kind: str, summary: str, raw: dict | None = None) -> None:
+        detail = json.dumps(raw, default=str)[:4000] if raw else ""
+        if kind == "tool_use" and self.outside.search(summary + detail):
+            self.outside_refs.append(summary[:300])
         row = {"t": round(time.monotonic() - self.repair.started, 2), "kind": kind,
                "summary": summary[:2000]}
+        if detail and kind in ("tool_use", "tool_result"):
+            row["raw"] = detail
         self.events.write(json.dumps(row) + "\n")
         self.events.flush()
         if kind in ("tool_use", "message", "status", "healer"):
@@ -564,16 +624,8 @@ class _AgentSession:
 
     def totals(self) -> dict[str, Any]:
         return {"agent_wall_s": round(self.wall, 1), "cost_usd": round(self.cost, 4),
-                "num_turns": self.turns, "usage": [_plain(u) for u in self.usage]}
-
-
-def _python() -> str:
-    """The interpreter to show the agent: relative when it is the project's venv."""
-    exe = Path(sys.executable)
-    try:
-        return str(exe.relative_to(ROOT))
-    except ValueError:
-        return str(exe)
+                "num_turns": self.turns, "usage": [_plain(u) for u in self.usage],
+                "outside_workspace_refs": self.outside_refs}
 
 
 def _plain(value: Any) -> Any:

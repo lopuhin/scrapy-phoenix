@@ -214,7 +214,10 @@ def run_gate(args: argparse.Namespace) -> list[Check]:
     from scrapy.utils.project import get_project_settings
 
     root = Path.cwd()
-    spider_cls = SpiderLoader.from_settings(get_project_settings()).load(args.spider)
+    settings = get_project_settings()
+    # In the agent's workspace only the repaired spider's package exists.
+    settings.set("SPIDER_LOADER_WARN_ONLY", True)
+    spider_cls = SpiderLoader.from_settings(settings).load(args.spider)
     package = spider_cls.variants_package
     pkg_root = package.split(".")[0]
     module_file = args.candidate.replace(".", "/") + ".py"

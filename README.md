@@ -33,6 +33,7 @@ developed further after the talk.
   spiders. Each has `variants/` (one module per layout variant, never edited
   in place) and `fixtures/` (web-poet regression fixtures). `sandbox_spider/`
   also has the item checks and the README with the crawl's intent.
+- `sandbox/`: the test store (a FastAPI app), with a `no_price` layout added.
 - `scripts/`: drift the test site's layout, score items against its ground
   truth, save fixtures, build the breakage matrix.
 - `docs/DESIGN.md`: the design. `docs/FINDINGS.md`: what building it showed.
@@ -45,17 +46,19 @@ pytest                                   # framework tests + fixtures, offline
 scrapy crawl books -O books.jsonl        # books.toscrape.com
 ```
 
-The sandbox spiders crawl a local
-[zyte-monitoring-sandbox](https://github.com/zytedata/zyte-monitoring-sandbox)
-instance (`uvicorn app.main:app --port 8765` from its repo root). Its layout
-can be switched on the fly with `python scripts/drift.py PRESET`, and
+The sandbox spiders crawl the test store in `sandbox/` (vendored from
+[zyte-monitoring-sandbox](https://github.com/zytedata/zyte-monitoring-sandbox),
+see `sandbox/README.md` to run it on port 8765). Its layout can be switched on
+the fly with `python scripts/drift.py PRESET`, and
 `python scripts/matrix.py` crawls every sandbox spider under every layout.
 
 The self-healing demo needs the `agent` extra (`uv pip install -e '.[agent]'`),
 an OpenAI API key for Codex, and `uv` (scrapy-mcp runs through `uvx`):
 
 ```
-python scripts/run_demo.py product-modern --reset   # products change layout
+python scripts/run_demo.py product-modern --reset    # A: products change layout
+python scripts/run_demo.py no-price --reset          # C: price gone; must refuse
+python scripts/run_demo.py infinite-scroll --reset   # B: listings switch to scrolling
 ```
 
 Each repair is recorded under `repairs/<id>/`: held pages, prompt, agent

@@ -148,7 +148,7 @@
                         <div class="form-group">
                             <label for="ACTIVE_LAYOUT">Active Layout</label>
                             <select id="ACTIVE_LAYOUT" name="ACTIVE_LAYOUT" class="{% if settings['ACTIVE_LAYOUT'] != defaults['ACTIVE_LAYOUT'] %}modified-input{% endif %}">
-                                {% set options = ["layout_default", "layout_modern", "layout_load_more", "layout_infinite_scroll", "layout_variant_dom_change", "layout_hidden_price"] %}
+                                {% set options = ["layout_default", "layout_modern", "layout_load_more", "layout_infinite_scroll", "layout_variant_dom_change", "layout_hidden_price", "layout_no_price"] %}
                                 {% for opt in options %}
                                 <option value="{{ opt }}" {% if settings['ACTIVE_LAYOUT'] == opt %}selected{% endif %}>{{ opt }}</option>
                                 {% endfor %}

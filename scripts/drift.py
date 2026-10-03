@@ -38,6 +38,8 @@ PRESETS: dict[str, dict[str, str]] = {
     "modern": {"ACTIVE_LAYOUT": "layout_modern", "AB_TEST_RATIO": "0.0"},
     "hidden-price": {"ACTIVE_LAYOUT": "layout_hidden_price", "AB_TEST_RATIO": "0.0"},
     "variant-dom-change": {"ACTIVE_LAYOUT": "layout_variant_dom_change", "AB_TEST_RATIO": "0.0"},
+    # Case C: prices only for signed-in members, everywhere (pages, cards, API).
+    "no-price": {"ACTIVE_LAYOUT": "layout_no_price", "AB_TEST_RATIO": "0.0"},
 }
 
 

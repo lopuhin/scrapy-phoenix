@@ -3,7 +3,7 @@
 Evidence gathered while building, for the design and the talk. The summary
 lists what still stands; the dated log below it keeps the details, newest first.
 
-## Summary (as of 2026-10-03, step 1 and Case A healed)
+## Summary (as of 2026-10-03: detection, and the repair loop on cases A, B and C)
 
 Step 1 built the detection side on four spiders: three layouts of the sandbox
 store and books.toscrape.com. Every spider extracts everything correctly on its
@@ -55,11 +55,11 @@ extracted fully correctly or refused. **No bad item was delivered.**
 
 ### Test setup
 
-9. **The "unfixable" case isn't unfixable yet.** `hidden-price` removes the
-   price from product pages, but it is still in the listing cards and at
-   `/partials/price/{id}`. A truly unfixable case needs a new `no_price` sandbox
-   layout. The layout case (A) uses the sandbox's A/B setting to switch only
-   product pages, and a ratio of 0.5 serves both layouts at once.
+9. **Case C needed a layout of its own.** `hidden-price` only moves the price
+   (it is still in the listing cards and at `/partials/price/{id}`). The
+   vendored sandbox now has `layout_no_price`, where the price is for
+   signed-in members only, everywhere. Case A uses the sandbox's A/B setting to
+   switch only product pages, and a ratio of 0.5 serves both layouts at once.
 10. **The default catalogue has no single-page categories.** That fixture is
     captured with `ITEMS_PER_PAGE=20`. Fixtures embed `127.0.0.1:8765` URLs, and
     regenerating them rewrites timestamps, which shows up as diff noise.
@@ -93,31 +93,111 @@ extracted fully correctly or refused. **No bad item was delivered.**
     sandbox site works only with `sandbox_workspace_write.network_access`.
     Writes outside the project fail with "Read-only file system".
 
-16. **Case A heals in under a minute, for about 3 cents.** Product pages switch
-    to a new layout mid-crawl. The crawl pauses with 18 pages held. The agent
-    writes `ProductPageV2` and passes the gate on the first try. The module is
-    hot-loaded and the crawl resumes: 566/566 products, every field correct
-    against ground truth. The pause took 48 s and the agent cost $0.026. With
-    half the products in each layout the result is the same: 281 pages go
-    through V1 and 285 through V2.
-17. **The agent wrote the variant from the held pages alone.** It read only
-    the spider's own package and the held pages, never the modern spider's
-    variant for the same layout in this repo. The talk can still say so only
-    because the event log shows it; the prompt doesn't forbid looking.
-18. **A crawl time limit counts the pause.** `CLOSESPIDER_TIMEOUT` fired 20 s
-    into a repair. The crawl closed cleanly, the agent was cancelled with no
-    stray processes, and the repair was recorded as `interrupted`. Re-downloading
-    doesn't disturb duplicate filtering: requests are exactly the normal crawl's
-    627 plus the 18 held pages.
+16. **All three cases behave as intended, each in about a minute and for
+    1–3 cents.** In the final round of runs:
+    - **A (products redesigned):** one repair, 42 s, 566/566 fully correct.
+      With half the products redesigned: 281 pages via V1, 285 via V2, all
+      correct.
+    - **C (price only for signed-in members):** the agent gives up in about
+      19 s. Nothing is loaded, the crawl closes with `repair_failed`, and the
+      demo script exits 1.
+    - **B (listings switch to infinite scroll):** one repair, 65 s, and a
+      variant that probes the scroll fragments until one is empty: 566/566.
+17. **The agent uses whatever it can reach, so the workspace has to be
+    curated.** When it worked in the live repo it found:
+    - the vendored site's templates and router, by grepping for "Sign in to see";
+    - the hand-written scroll spider for the same layout, which it then followed;
+    - the root README, which names the demo cases ("C: … must refuse");
+    - the site's `/openapi.json`, through the live crawl, which lists the hidden
+      ground-truth endpoints.
+
+    Now the agent works in a one-commit copy of just its spider (66 files). The
+    sandbox serves no OpenAPI. Commands that name the live project are counted.
+    The answers didn't change, but the evidence for them is now legitimate.
+18. **Outcomes vary from run to run; the loop absorbs it.** Case B produced one
+    class covering category pages and fragments in two runs, two classes in
+    another. In a third, the first repair forgot the fragments: they were refused
+    after resume, which started a second, smaller repair (3 pages, 31 s). In
+    every case the crawl ended 566/566.
+19. **The live tree must only ever gain the one module.** The first version
+    rolled back with `git checkout`, which reverted unrelated edits made by a
+    person during a repair. The scope check also failed on those edits. Now
+    scope is checked in the agent's workspace, and rollback deletes only the
+    module the healer copied in.
+20. **A crawl time limit counts the pause.** `CLOSESPIDER_TIMEOUT` fired 20 s
+    into a repair. The crawl closed cleanly, the agent was cancelled, and the
+    repair was recorded as `interrupted`. Re-downloading doesn't disturb
+    duplicate filtering: requests are the normal crawl's plus the held pages.
 
 ### Still unverified
 
-- The failure path end to end: give-up, a failing gate after the retry, rollback
-  of a written module (Case C, needs the `no_price` layout).
-- Navigation repairs (Case B) and staged repairs (navigation, then products).
-- Whether the agent ever needs shell network access.
+- A navigation repair followed by a product repair in one run (e.g. the
+  `modern` layout, where everything changes).
+- The retry path where the agent fixes its own module after a failed gate.
+  The only gate failures so far were caused by our own setup.
+- Whether the agent ever needs shell network access: it hasn't so far.
 
 # Log
+
+## 2026-10-03 — Cases B and C, a clean workspace for the agent
+
+Vendored the sandbox into `sandbox/` and added `layout_no_price` (drift preset
+`no-price`). In that layout product pages say "Sign in to see our price",
+listing cards have no price, and `/partials/price/{id}` returns 401. Only
+`price`/`currency` are refused, the same way `hidden-price` behaves.
+
+**What the agent found when it could see the whole repo**, and what we changed:
+
+| run | what it read | change |
+|---|---|---|
+| C, first | `rg "Sign in to see" .` hit `sandbox/app/templates/.../layout_no_price/detail.html` and the router | agent works in a temp copy |
+| A, copy | ran `rg` on the live repo's absolute path, learned from the `.venv/bin/python` path in the gate command | `.selfheal/python` wrapper |
+| B | read `sandbox_scroll/variants/navigation_v1.py` before writing its own | copy only the repaired spider's package + `selfheal/` |
+| C | fetched `/openapi.json` through the crawl, found `/sandbox-store/data/product/{id}` | sandbox: `openapi_url=None`, `docs_url=None` |
+| C | read the root `README.md` ("C: price gone; must refuse") | top-level files: only `scrapy.cfg`, `pyproject.toml`, `.gitignore`, `LICENSE` |
+| C | probed `?member=true`, `?auth=true`, `/login` through the crawl | prompt: don't get around sign-in or access controls |
+
+Every Case C run gave up for the right reason. In the run that found
+`/data/product/{id}`, the agent noted that a page object only gets the product
+page, so it couldn't use the endpoint anyway. After the prompt change it
+stopped probing and gave up from the held pages alone: 6 turns, 19 s,
+$0.011, versus 14 turns and $0.024 before.
+
+**A bug in the healer, found by accident.** I edited `README.md` while a Case A
+repair ran. The healer's live-tree scope check flagged the edit on both
+attempts, failed the repair, and rolled back with `git checkout`, which reverted
+the edit. Now the scope check runs in the agent's workspace, and rollback
+deletes only the copied module. A test edit to `docs/FINDINGS.md` during the
+next Case A repair survived, and the repair passed.
+
+**scrapy-mcp in use.** The agent first passed the pid as `job_id`, which
+failed; the prompt now gives the exact job id. Since then it uses the live crawl
+for its own checks: fetching a held page again (`download_async` while paused
+works), comparing listing pages, and probing URLs. In the final round only Case
+B used it (2 calls).
+
+**Final round** (clean workspace, 66 files):
+
+| case | held | agent | paused | cost | turns | gate | result |
+|---|---|---|---|---|---|---|---|
+| A `product-modern` | 18 | 41.3 s | 42.3 s | $0.017 | 9 | pass | 566/566 fully correct, 645 requests |
+| C `no-price` | 17 | 18.8 s | 18.9 s | $0.011 | 6 | — (gave up) | `repair_failed`, exit 1 |
+| B `infinite-scroll` | 20 | 64.2 s | 65.2 s | $0.026 | 16 | pass | 566/566, 670 requests |
+| A `product-modern-half` | 9 | 44.1 s | 45.0 s | $0.021 | 11 | pass | 566/566 (281 V1 + 285 V2) |
+
+- **Case B is how a navigation repair continues.** Re-queued listing pages go
+  through the new variant, which yields product requests and then fragment
+  probes. The scroll spider built by hand made 647 requests; the healed one
+  makes 670 (20 held pages fetched again, plus a few probes). Across the runs
+  the agent's design varied:
+  - one class matching both category pages and fragments;
+  - two classes;
+  - one class that forgot the fragments, followed by a second repair.
+
+  All of them ended 566/566.
+- **The canary records `refused` > 0 for a variant that missed something.**
+  In the staged Case B run, the first repair's canary had `refused: 3`. The
+  refused fragments were held and started the second repair.
 
 ## 2026-10-03 — Case A end to end: healer, gate, hot-load
 

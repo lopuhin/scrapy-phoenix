@@ -119,8 +119,9 @@ Item type: `{item_type}`. Held pages (body + JSON with URL and evidence) are in
 The live crawl is reachable through the scrapy-mcp tools (`job_id`: `{job_id}`).
 You may inspect it and fetch pages through it (e.g. `await
 crawler.engine.download_async(Request(url))`), but do not change its state: the
-healer loads your module.
-Your shell has no network access.
+healer loads your module. Don't try to get around sign-in or other access
+controls: data the site only shows to signed-in users is not available to this
+spider. Your shell has no network access.
 
 If the pages cannot be extracted in a way that meets the intent (e.g. data the
 README requires is not on the page at all), do not force it: answer with
@@ -306,15 +307,16 @@ class Healer:
 
         The agent works here, not in the live tree, and sees what a deployment
         of this one spider would contain: the spider's own package, the
-        ``selfheal`` framework, the top-level project files and this repair's
-        held pages. Other spiders, the test site's source, notes, scripts and
-        earlier repairs' records stay out of sight.
+        ``selfheal`` framework, the project's config files and this repair's
+        held pages. Other spiders, the test site's source, notes and READMEs
+        about the project, scripts and earlier repairs' records stay out of
+        sight (the spider's own README, its intent, is in its package).
         """
         package = self.spider.variants_package.split(".")[0]
         keep = (f"{package}/", "selfheal/")
         root = Path(tempfile.mkdtemp(prefix=f"selfheal-{repair.id}-")) / "project"
         for rel in tracked_files(ROOT):
-            if "/" in rel and not rel.startswith(keep):
+            if not (rel.startswith(keep) or rel in _PROJECT_FILES):
                 continue
             target = root / rel
             target.parent.mkdir(parents=True, exist_ok=True)
@@ -536,6 +538,10 @@ class Healer:
             repair.metrics |= {"outcome": "interrupted", "reason": reason}
             self._record(repair)
         self.crawler.stats.set_value("selfheal/repairs", len(self.repairs))
+
+
+# Top-level files the agent's workspace gets: what a deployment needs.
+_PROJECT_FILES = {"scrapy.cfg", "pyproject.toml", ".gitignore", "LICENSE"}
 
 
 class _AgentSession:

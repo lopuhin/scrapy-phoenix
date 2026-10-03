@@ -8,7 +8,9 @@ from app.core.config import settings
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-app = FastAPI(title=settings.PROJECT_NAME)
+# No /openapi.json or /docs: they would list the ground-truth /data endpoints,
+# which crawlers (and the repair agent) must not discover.
+app = FastAPI(title=settings.PROJECT_NAME, openapi_url=None, docs_url=None, redoc_url=None)
 
 app.mount(
     "/static", StaticFiles(directory=os.path.join(BASE_DIR, "static")), name="static"

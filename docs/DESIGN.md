@@ -33,7 +33,7 @@ web-poet or related libraries if the design needs changes there (§4.1).
             │                                           ▼                                │
             │                                  repair task (asyncio)                     │
             │                                   ├ harness-run session (Codex)            │
-            │                                   │   edits variants/ in place,           │
+            │                                   │   writes variants/ in a clean copy,   │
             │                                   │   inspects crawl via scrapy-mcp ──┐    │
             │                                   ├ validation gate (subprocess)      │    │
             │                                   ├ hot-load via Remote Control ──────┤    │
@@ -298,11 +298,24 @@ prompt in phase 0; a read-only scrapy-mcp mode is possible hardening.
 
 ### 6.2 The agent session
 
-- **The agent edits the live tree in place:** `local.deploy(spec, workspace=<project root>)`.
-  This is safe because the running process only imports new code when the healer
-  hot-loads it, so a half-written file has no effect. The healer takes the diff from
-  git. On failure it restores the agent-editable paths (`git checkout`/`git clean` on
-  `variants/` only). An edit outside those paths fails the gate.
+- **The agent works in a clean copy, not the live tree** *(changed after the first
+  runs)*. The first version had the agent edit the project root in place, and two
+  things went wrong:
+  - The agent read whatever the repo held. It grepped the vendored test site's
+    source (Case C), and it read the hand-written spider for the same layout
+    (Case B).
+  - Rolling back with `git checkout` reverted unrelated edits a person had made
+    in the live tree during the repair.
+
+  Now the healer builds a temp workspace from a single commit with no history. It
+  holds the repaired spider's own package, `selfheal/`, `scrapy.cfg`,
+  `pyproject.toml`, `.gitignore` and `LICENSE`, plus `.selfheal/held/` and a
+  `.selfheal/python` wrapper. The scope check runs there against that commit. Only
+  the new module is copied into the live tree, where the healer runs the rest of
+  the gate. Rollback deletes that one file. The workspace is roughly what a
+  deployed project looks like, for example on Scrapy Cloud. Reads outside it
+  can't be prevented without a container, so commands that name the live project
+  are counted in `metrics.json` (`outside_workspace_refs`).
 - **Permissions (`permission_mode="acceptEdits"`).** harness-run translates its
   `permission_mode` into a Codex *sandbox mode* plus an *approval policy*:
 
@@ -315,7 +328,7 @@ prompt in phase 0; a read-only scrapy-mcp mode is possible hardening.
 
   `workspace_write` means every shell command the agent runs goes through Codex's OS
   sandbox on Linux (Landlock/seccomp). Commands may read anywhere but **write only
-  inside the workspace (the project root) and temp dirs**, and have **no network** by
+  inside the workspace and temp dirs**, and have **no network** by
   default. The agent itself is never blocked waiting for approval: disallowed actions
   just fail. So the agent can edit `variants/`, run `pytest` and the gate, and use
   scrapy-mcp, but it can't write to `~/.ssh`, `~/.local`, other repos, or reach the
@@ -330,17 +343,16 @@ prompt in phase 0; a read-only scrapy-mcp mode is possible hardening.
     without it: held pages and fetches through the crawl via scrapy-mcp should
     be enough.
 
-  Scope rules such as "only `variants/`" are enforced by the gate, not the sandbox:
-  the sandbox boundary is the whole project root. If this turns out to be friction,
-  `bypassPermissions` is the fallback. It is simpler, but the agent could then write
-  anywhere on the machine.
-- **Inputs:** `repairs/<id>/held/*.html` + info JSON, the `LayoutMismatch` /
-  `NavigationMismatch` evidence, `README.md`. The existing variants, items and fixtures
-  are already in the tree, and the live crawl is reachable via scrapy-mcp. The prompt
-  names the check command:
-  `python -m selfheal.gate --spider sandbox_store --candidate sandbox_spider.variants.product_v2
-  --held repairs/<id>/held --baseline repairs/<id>/baseline.json`
-  (the same gate the healer runs, §7).
+  Scope rules such as "only one new module in `variants/`" are enforced by the gate,
+  not the sandbox: the sandbox boundary is the whole workspace.
+- **Inputs:** `.selfheal/held/*.html` + info JSON, the `LayoutMismatch` /
+  `NavigationMismatch` evidence, and the spider's `README.md` and `items.py`. The
+  existing variants and fixtures are in the workspace. The live crawl is reachable
+  via scrapy-mcp: the prompt gives the exact `job_id` and says not to change the
+  crawl's state or get around sign-in. The prompt also names the check command,
+  which is the same gate the healer runs (§7):
+  `.selfheal/python -m selfheal.gate --spider sandbox_store --candidate
+  sandbox_spider.variants.product_v2 --held .selfheal/held --baseline .selfheal/baseline.json`.
 - **Structured output** (pydantic, `extra="forbid"`, all fields required):
   `RepairProposal{kind: "variant"|"give_up", module, class_names, summary,
   confidence: "high"|"medium"|"low", evidence}`. The healer picks the module name
@@ -483,8 +495,8 @@ is to find gaps in the detection model while they are cheap to fix.
   becomes a "harder repair" demo.
 - **D2: sandbox.** Add layouts as needed (`no_price`; maybe a milder product-only
   redesign).
-- **D3: the agent edits the live tree in place**, with a git-based record and rollback
-  (§6.2).
+- **D3: the agent works in a clean one-commit copy of its spider**; only the new module
+  reaches the live tree (§6.2). *(Was: edits the live tree in place.)*
 - **D4: scrapy-mcp is core from phase 0** (§5.1).
 - **D5: detection = page objects raising** (`must`/`may`, any exception), with no
   separate recognizer (§4).

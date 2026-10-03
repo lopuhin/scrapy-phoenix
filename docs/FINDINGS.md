@@ -9,10 +9,14 @@ Evidence gathered while building, for the design and the talk. Newest first.
   `.pagination` on product-less pages) is gone. Where an anchor was telling page
   types apart, that context now lives in the selector used for extraction
   (`.hero ~ .grid .card a`). All fixtures still produce identical output.
-  - **The matrices below predate this cleanup and need a re-run.** One known
-    change: the default spider's category variant now accepts the scroll
-    layout's product-less top-category page with identical output, so refusals
-    on scroll/load-more move from top-level categories to subcategory pages.
+  - Re-run breakage matrix (below). Items and fully-correct counts are unchanged
+    in every cell. The one difference: under `infinite-scroll` and `load-more`,
+    `sandbox_store` now accepts the 4 product-less top-level categories
+    (identical output, nothing to fix there) and refuses the 20 subcategory pages,
+    exactly where pagination went missing. Before, it refused the 4 top-level
+    categories and never reached the subcategories. That's more evidence for a
+    repair, in the right place. Some "first refusal" evidence now names a
+    different selector because the anchors are gone.
 - **New offline gate test: no routing theft** (`tests/test_routing.py`). Every
   variant of every spider is run on every other variant's fixtures (228 pairs).
   A variant may accept a page only if it produces exactly the fixture's output.
@@ -35,6 +39,35 @@ Evidence gathered while building, for the design and the talk. Newest first.
   subcategories, products) from a reference run, with a refusal on a large
   deviation. That is the "reference run" in DESIGN §8, and the first concrete
   reason to add external state.
+
+Breakage matrix after the cleanup (`python scripts/matrix.py`):
+
+| spider | sandbox layout | requests | items | fully correct | variants used | refused | first refusal |
+|---|---|---|---|---|---|---|---|
+| sandbox_store | default | 627 | 566 | 566/566 | CategoryPageV1 60, HomePageV1 1, ProductPageV1 566 | — |  |
+| sandbox_store | product-modern | 627 | 0 | — | CategoryPageV1 60, HomePageV1 1 | Product 566 | no Product variant accepts /product/…: — ProductPageV1.description [extract]: '.product-info > p' matched nothing |
+| sandbox_store | product-modern-half | 627 | 281 | 281/281 | CategoryPageV1 60, HomePageV1 1, ProductPageV1 281 | Product 285 | no Product variant accepts /product/…: — ProductPageV1.description [extract]: '.product-info > p' matched nothing |
+| sandbox_store | infinite-scroll | 25 | 0 | — | CategoryPageV1 4, HomePageV1 1 | ProductNavigation 20 | no ProductNavigation variant accepts /category/cat_3_sub_4: — CategoryPageV1.pageNumber [extract]: '.pagination' matched nothing |
+| sandbox_store | load-more | 25 | 0 | — | CategoryPageV1 4, HomePageV1 1 | ProductNavigation 20 | no ProductNavigation variant accepts /category/cat_3_sub_4: — CategoryPageV1.pageNumber [extract]: '.pagination' matched nothing |
+| sandbox_store | modern | 1 | 0 | — | — | ProductNavigation 1 | no ProductNavigation variant accepts /: — CategoryPageV1.items [extract]: '.grid-3' matched nothing |
+| sandbox_store | hidden-price | 627 | 0 | — | CategoryPageV1 60, HomePageV1 1 | Product 566 | no Product variant accepts /product/…: — ProductPageV1.currency [extract]: '.product-info .price-tag' matched nothing |
+| sandbox_store | variant-dom-change | 627 | 566 | 566/566 | CategoryPageV1 60, HomePageV1 1, ProductPageV1 566 | — |  |
+| sandbox_modern | default | 1 | 0 | — | — | ProductNavigation 1 | no ProductNavigation variant accepts /: — CategoryPageV1.items [extract]: '.inventory-table table tbody' matched nothing |
+| sandbox_modern | product-modern | 1 | 0 | — | — | ProductNavigation 1 | no ProductNavigation variant accepts /: — CategoryPageV1.items [extract]: '.inventory-table table tbody' matched nothing |
+| sandbox_modern | product-modern-half | 1 | 0 | — | — | ProductNavigation 1 | no ProductNavigation variant accepts /: — CategoryPageV1.items [extract]: '.inventory-table table tbody' matched nothing |
+| sandbox_modern | infinite-scroll | 1 | 0 | — | — | ProductNavigation 1 | no ProductNavigation variant accepts /: — CategoryPageV1.items [extract]: '.inventory-table table tbody' matched nothing |
+| sandbox_modern | load-more | 1 | 0 | — | — | ProductNavigation 1 | no ProductNavigation variant accepts /: — CategoryPageV1.items [extract]: '.inventory-table table tbody' matched nothing |
+| sandbox_modern | modern | 627 | 566 | 566/566 | CategoryPageV1 60, DashboardPageV1 1, ProductPageV1 566 | — |  |
+| sandbox_modern | hidden-price | 1 | 0 | — | — | ProductNavigation 1 | no ProductNavigation variant accepts /: — CategoryPageV1.items [extract]: '.inventory-table table tbody' matched nothing |
+| sandbox_modern | variant-dom-change | 1 | 0 | — | — | ProductNavigation 1 | no ProductNavigation variant accepts /: — CategoryPageV1.items [extract]: '.inventory-table table tbody' matched nothing |
+| sandbox_scroll | default | 5 | 0 | — | HomePageV1 1 | ProductNavigation 4 | no ProductNavigation variant accepts /category/cat_3: — ScrollCategoryPageV1.items [extract]: '#product-grid' matched nothing |
+| sandbox_scroll | product-modern | 5 | 0 | — | HomePageV1 1 | ProductNavigation 4 | no ProductNavigation variant accepts /category/cat_3: — ScrollCategoryPageV1.items [extract]: '#product-grid' matched nothing |
+| sandbox_scroll | product-modern-half | 5 | 0 | — | HomePageV1 1 | ProductNavigation 4 | no ProductNavigation variant accepts /category/cat_3: — ScrollCategoryPageV1.items [extract]: '#product-grid' matched nothing |
+| sandbox_scroll | infinite-scroll | 647 | 566 | 566/566 | HomePageV1 1, ProductCardsFragmentV1 56, ProductPageV1 566, ScrollCategoryPageV1 24 | — |  |
+| sandbox_scroll | load-more | 647 | 566 | 566/566 | HomePageV1 1, ProductCardsFragmentV1 56, ProductPageV1 566, ScrollCategoryPageV1 24 | — |  |
+| sandbox_scroll | modern | 1 | 0 | — | — | ProductNavigation 1 | no ProductNavigation variant accepts /: — ScrollCategoryPageV1.items [extract]: '#product-grid' matched nothing |
+| sandbox_scroll | hidden-price | 5 | 0 | — | HomePageV1 1 | ProductNavigation 4 | no ProductNavigation variant accepts /category/cat_3: — ScrollCategoryPageV1.items [extract]: '#product-grid' matched nothing |
+| sandbox_scroll | variant-dom-change | 5 | 0 | — | HomePageV1 1 | ProductNavigation 4 | no ProductNavigation variant accepts /category/cat_3: — ScrollCategoryPageV1.items [extract]: '#product-grid' matched nothing |
 
 ## 2026-09-28 — step 1b: three more spiders on the framework
 
@@ -65,7 +98,8 @@ Own-layout crawls (no false positives, everything correct):
 Probing costs **one extra request per listing** (647 vs 627: 20 subcategories →
 20 empty "past the end" fragments).
 
-Breakage matrix, 3 sandbox spiders × 8 layouts (`python scripts/matrix.py`):
+Breakage matrix, 3 sandbox spiders × 8 layouts (`python scripts/matrix.py`;
+superseded by the re-run after the anchor cleanup above):
 
 | spider | sandbox layout | requests | items | fully correct | variants used | refused | first refusal |
 |---|---|---|---|---|---|---|---|
@@ -123,7 +157,7 @@ Observations:
 
 ## 2026-09-28 — step 1: framework core + sandbox default-layout spider
 
-Breakage matrix (`python scripts/matrix.py`, no healer; "fully correct" = every
+Breakage matrix (superseded by later runs above; `python scripts/matrix.py`, no healer; "fully correct" = every
 scored field matches the sandbox ground truth):
 
 | preset | items | fully correct | variants used | refused | first refusal |

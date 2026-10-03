@@ -125,13 +125,22 @@ def _item_urls(nav: Any) -> set[str]:
 
 
 def check_progress(previous: Any, current: Any) -> None:
-    """A next page must list products the previous page did not.
+    """A next page must come after the previous one and list new products.
 
-    This is what catches blind pagination (``?page=N+1`` without a link) on a
+    Page numbers, when both pages have one, must go up by exactly one: a "next"
+    link that points back (e.g. a variant that picked the "Prev" button) is
+    refused here instead of vanishing in the dupefilter, as long as the spider
+    doesn't filter ``nextPage`` requests. Items must not all repeat the previous
+    page's: that catches blind pagination (``?page=N+1`` without a link) on a
     site that ignores the parameter and serves page 1 again (``docs/DESIGN.md``
     §4.3 case 3). An empty next page is fine: that is how a probe proves the
     end.
     """
+    before, after = getattr(previous, "pageNumber", None), getattr(current, "pageNumber", None)
+    if before is not None and after is not None and after != before + 1:
+        raise NavigationMismatch(
+            "pageNumber", f"page {after} does not follow page {before}"
+        )
     seen, now = _item_urls(previous), _item_urls(current)
     if now and now <= seen:
         raise NavigationMismatch(
@@ -237,7 +246,7 @@ class Variants:
             try:
                 check_progress(previous, item)
             except NavigationMismatch as exc:
-                return None, [Refusal(cls.__qualname__, "progress", "items", str(exc))]
+                return None, [Refusal(cls.__qualname__, "progress", exc.selector, str(exc))]
         return item, []
 
     async def extract(

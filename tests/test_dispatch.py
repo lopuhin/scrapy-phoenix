@@ -1,10 +1,12 @@
+from types import SimpleNamespace
+
 import attrs
 import pytest
 from web_poet import HttpResponse, Returns, WebPage, field
 from zyte_common_items import ProbabilityRequest
 
-from selfheal.dispatch import ItemCheckError, Unrecognized, Variants
-from selfheal.strict import LayoutMismatch, StrictMixin
+from selfheal.dispatch import ItemCheckError, Unrecognized, Variants, check_progress
+from selfheal.strict import LayoutMismatch, NavigationMismatch, StrictMixin
 
 
 @attrs.define
@@ -138,6 +140,14 @@ async def test_next_page_repeating_previous_is_refused():
         await v.extract(Nav, cards("/a", "/b"), previous=first)
     [refusal] = info.value.refusals
     assert refusal.stage == "progress" and "repeat" in refusal.error
+
+
+def test_next_page_number_must_follow_the_previous():
+    check_progress(SimpleNamespace(pageNumber=1, items=None), SimpleNamespace(pageNumber=2, items=None))
+    check_progress(SimpleNamespace(pageNumber=None, items=None), SimpleNamespace(pageNumber=5, items=None))
+    with pytest.raises(NavigationMismatch, match="page 1 does not follow page 2"):
+        # e.g. a variant that took the "Prev" button for "Next"
+        check_progress(SimpleNamespace(pageNumber=2, items=None), SimpleNamespace(pageNumber=1, items=None))
 
 
 async def test_refusals_rank_the_closest_variant_first(variants):

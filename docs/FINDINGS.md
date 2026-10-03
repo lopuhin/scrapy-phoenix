@@ -129,15 +129,75 @@ extracted fully correctly or refused. **No bad item was delivered.**
     repair was recorded as `interrupted`. Re-downloading doesn't disturb
     duplicate filtering: requests are the normal crawl's plus the held pages.
 
+21. **A variant for pages the agent never had a held example of can be
+    wrong without anyone noticing.** On the full `modern` redesign, only the
+    home page was held. The agent also wrote a category variant from pages it
+    fetched itself. That variant took the "Prev" button for "Next", and the
+    dupefilter dropped the backwards links: 445/566 items, with no refusal and
+    no error. Three rules now apply:
+    - The gate rejects any class that no held page reaches.
+    - Page numbers must go up by one.
+    - `nextPage` requests skip the dupefilter, so a backwards link is refused.
+
+    The same bug is now caught, but the repair doesn't converge (next point).
+22. **Open: a bad "next" link is a fault of the page that has it, but the
+    page held is the one it points to.** The progress check refuses page 1
+    ("does not follow page 2"). The agent gets page 1, which is fine on its
+    own, writes another variant for it, and the cycle repeats until the repair
+    limit. The fix: hold the referring page too (re-download it), and have the
+    gate check that the candidate's `nextPage` on it changed. Until then,
+    `modern` ends `repair_failed` after six tested stages, and nothing wrong is
+    delivered.
+23. **The gate now compares field coverage with the fixtures.** One Case A
+    run passed every check but left "Color" in `additionalProperties`, so 268
+    products had no `color`. The `fields` check rejects that, and in the next
+    run the agent caught it with the gate itself: 566/566 on all 10 fields.
+
 ### Still unverified
 
-- A navigation repair followed by a product repair in one run (e.g. the
-  `modern` layout, where everything changes).
-- The retry path where the agent fixes its own module after a failed gate.
-  The only gate failures so far were caused by our own setup.
+- The retry path where the agent fixes its own module after the healer's gate
+  run fails. So far the agent has fixed problems itself, using the gate,
+  before answering.
 - Whether the agent ever needs shell network access: it hasn't so far.
 
 # Log
+
+## 2026-10-03 — the full `modern` redesign: staged repairs and what they exposed
+
+`modern` changes every page type, so the crawl first refuses the home page,
+which is the only page it has. Three runs:
+
+1. **Before the new rules: 445/566, silently.**
+   - Repair 1 held only the home page. The agent wrote `HomePageV2` plus a
+     `CategoryPageV2` based on category pages it fetched through scrapy-mcp.
+   - Repair 2 handled products.
+   - The category variant's `nextPage` took the first `.control-panel` button.
+     On page 2 and later that is "Prev". The link back was dropped as a
+     duplicate, so each listing stopped at page 2. No refusal, nothing in the
+     stats.
+2. **After "every class must handle a held page" (limit 3 repairs).** The
+   stages were home (1 page, 34 s), top categories (4 pages, 25 s) and
+   subcategory pages (20 pages, 46 s). Then the limit was reached while products
+   and later listing pages waited: `repair_failed`.
+3. **Limit 6.** Six stages: home, top categories, subcategories, products, then
+   twice "page 1 does not follow page 2". The progress check now catches the
+   same Prev/Next bug. Each time the held page was the target page 1, not
+   page 2 with the bad link. Variants V5 and V6 were written for page 1,
+   which never fixes page 2. The run ended `repair_failed` with 63 correct
+   items and no wrong ones.
+
+Case B under the same rules goes through two tested stages: category pages
+(20 held, 58 s), then the fragment probes (3 held, 29 s). It ends 566/566,
+same as the staged run earlier. Case A is unaffected (566/566). A plain
+default crawl still makes 627 requests, since `dont_filter` on `nextPage`
+costs nothing when links go forward.
+
+**A field dropped silently.** One Case A run passed every gate check but left
+"Color" in `additionalProperties` instead of `color`: 298/566 correct on
+`color` and `additionalProperties`. The new `fields` check fails that module:
+"color is filled on 4/6 existing fixtures but on none of the held pages". In
+the next run the agent passed the gate on the first attempt with all 10 fields
+566/566, after 17 turns, 90 s and $0.026.
 
 ## 2026-10-03 — Cases B and C, a clean workspace for the agent
 

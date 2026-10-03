@@ -18,7 +18,7 @@ the spider hands it here instead of dropping it:
 Settings: ``SELFHEAL_ENABLED``, ``SELFHEAL_MODEL`` (``gpt-5.6-luna``),
 ``SELFHEAL_REASONING_EFFORT`` (``medium``), ``SELFHEAL_BUDGET_USD`` (3),
 ``SELFHEAL_MAX_TURNS`` (80), ``SELFHEAL_AGENT_TIMEOUT`` (seconds, 900),
-``SELFHEAL_MAX_REPAIRS`` (3), ``SELFHEAL_HELD_PAGES`` (20),
+``SELFHEAL_MAX_REPAIRS`` (6), ``SELFHEAL_HELD_PAGES`` (20),
 ``SELFHEAL_CANARY`` (10), ``SELFHEAL_REPAIRS_DIR`` (``repairs``).
 """
 
@@ -112,7 +112,13 @@ Item type: `{item_type}`. Held pages (body + JSON with URL and evidence) are in
 
    It checks: only that file was added; existing fixtures still pass; the new
    class doesn't take over other variants' fixture pages; every held page is
-   extracted and passes the item checks; values vary across pages.
+   extracted and passes the item checks; every class you define handles at
+   least one held page; values vary across pages.
+
+   Write classes only for the kinds of pages that were held. If the site has
+   changed elsewhere too (e.g. listing pages you can see through the crawl),
+   leave them: once the crawl resumes, those pages are held and repaired with
+   real examples.
 3. Look at the extracted items yourself too: are they *right*, per the README?
    Passing checks is necessary, not sufficient.
 
@@ -158,7 +164,7 @@ class Healer:
         self.budget_usd = settings.getfloat("SELFHEAL_BUDGET_USD", 3.0)
         self.max_turns = settings.getint("SELFHEAL_MAX_TURNS", 80)
         self.agent_timeout = settings.getfloat("SELFHEAL_AGENT_TIMEOUT", 900)
-        self.max_repairs = settings.getint("SELFHEAL_MAX_REPAIRS", 3)
+        self.max_repairs = settings.getint("SELFHEAL_MAX_REPAIRS", 6)
         self.max_held_pages = settings.getint("SELFHEAL_HELD_PAGES", 20)
         self.canary_size = settings.getint("SELFHEAL_CANARY", 10)
         self.repairs_dir = ROOT / settings.get("SELFHEAL_REPAIRS_DIR", "repairs")

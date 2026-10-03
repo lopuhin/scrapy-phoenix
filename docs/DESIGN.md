@@ -396,13 +396,20 @@ block the crawl. The healer runs it itself and does not trust the agent's claim.
    positively establishes that it is the last page (§4.3).
 7. **Scope:** the diff touches only `variants/`.
 
-As built, checks 3, 4 and 6 are one `coverage` check: each held page goes
-through `Variants.try_variant`, which runs the item checks, and navigation
-variants prove the last page themselves (§4.3). Check 5 is `variation`: with 3
-or more held pages, `name`, `sku`, `description` and `items` must not have the
-same value on every page. Check 7 compares file hashes with a baseline the
-healer takes when the repair starts. The only change allowed is the one new
-module.
+As built:
+- Checks 3, 4 and 6 are one `coverage` check. Each held page goes through
+  `Variants.try_variant`, which runs the item checks, and navigation variants
+  prove the last page themselves (§4.3).
+- Coverage also requires **every class in the candidate module to accept at
+  least one held page**. Untested code doesn't load. Pages of a kind that
+  wasn't held get held after resume and repaired with real examples.
+- Check 5 is two checks:
+  - `variation`: with 3 or more held pages, `name`, `sku`, `description` and
+    `items` must not have the same value on every page;
+  - `fields`: any field the existing fixtures of that item type fill must be
+    filled on at least one held page. This catches a variant that silently
+    drops a field.
+- Check 7 runs in the agent's workspace, against its single commit (§6.2).
 
 **Canary** (live, after resume): the first K (e.g. 10) new pages routed to the new
 variant must pass both gates of §4.2. A failure re-holds the page and triggers a

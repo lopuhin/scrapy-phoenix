@@ -191,6 +191,35 @@ def check_variation(accepted: list[tuple[HeldPage, type, Any]]) -> Check:
     return Check("variation", not problems, f"{len(accepted)} pages", problems)
 
 
+def check_fields(accepted: list[tuple[HeldPage, type, Any]], fixtures_dir: Path,
+                 item_cls: type) -> Check:
+    """Fields the existing variants fill must be filled by the candidate too.
+
+    A field that some fixture output of the same item type has must show up on
+    at least one held page. This catches a new variant that silently drops a
+    field (e.g. leaves "Color" in ``additionalProperties`` instead of ``color``).
+    """
+    known: dict[str, int] = {}
+    total = 0
+    for path in sorted(fixtures_dir.glob("*/*/output.json")):
+        if get_item_cls(_import_class(path.parent.parent.name)) is not item_cls:
+            continue
+        total += 1
+        for name, value in json.loads(path.read_text()).items():
+            if value not in (None, [], "", {}):
+                known[name] = known.get(name, 0) + 1
+    filled = {
+        name for _, _, item in accepted
+        for name, value in _plain(item).items() if value not in (None, [], "", {})
+    }
+    problems = [
+        f"{name} is filled on {n}/{total} existing fixtures but on none of the held pages"
+        for name, n in sorted(known.items()) if name not in filled
+    ]
+    return Check("fields", not problems, f"{len(known)} fields known from {total} fixtures",
+                 problems)
+
+
 def _plain(value: Any) -> Any:
     if isinstance(value, list):
         return [_plain(v) for v in value]
@@ -246,12 +275,21 @@ def run_gate(args: argparse.Namespace) -> list[Check]:
     item_types = {get_fq_class_name(get_item_cls(c)) for c in candidates}
     pages = [p for p in load_held(Path(args.held)) if p.item_type in item_types]
     accepted, problems = run_held(candidates, variants, pages)
+    # Untested code doesn't load: a class no held page reaches has never been
+    # run on this site. Pages of that kind get held (and repaired) later.
+    used = {cls for _, cls, _ in accepted}
+    problems += [f"{c.__qualname__} accepts none of the held pages (untested)"
+                 for c in candidates if c not in used]
     checks.append(Check(
         "coverage", bool(pages) and not problems,
         f"{len(accepted)}/{len(pages)} held pages accepted (extraction + item check)",
         problems or ([] if pages else ["no held pages of the candidate's item type"]),
     ))
     checks.append(check_variation(accepted))
+    for item_cls in {get_item_cls(c) for c in candidates}:
+        mine = [a for a in accepted if get_item_cls(a[1]) is item_cls]
+        if mine:
+            checks.append(check_fields(mine, root / pkg_root / "fixtures", item_cls))
 
     if args.save_fixtures and all(c.ok for c in checks):
         for page, cls, item in accepted:

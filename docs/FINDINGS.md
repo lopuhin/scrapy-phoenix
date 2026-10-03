@@ -210,6 +210,15 @@ extracted fully correctly or refused. **No bad item was delivered.**
     took 4 stages on Sol (home, top categories, listings, products), against 6
     on Luna; each stage costs 9–15 cents on Sol, against 1–3 on Luna.
 
+29. **In a container, Codex's sandbox can't start, and scrapy-mcp is a way
+    around any sandbox anyway.** In the Scrapy Cloud image (tested locally as a
+    non-root user) the agent's shell failed to start under `acceptEdits`. The
+    agent carried on through scrapy-mcp `execute`, which runs Python inside
+    the crawl process, unsandboxed: it read files and ran the gate there. So
+    the real boundary is the container, not Codex's sandbox; the image runs
+    the agent with `bypassPermissions`. With that (and pytest in the image),
+    Case A against the deployed sandbox healed: 566/566, $0.13, first try.
+
 ### Still unverified
 
 - The retry path where the agent fixes its own module after the healer's gate

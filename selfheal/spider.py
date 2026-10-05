@@ -56,6 +56,7 @@ class SelfHealingSpider(scrapy.Spider):
             await self.on_unrecognized(exc, response, previous)
             return None
         stats.inc_value(f"selfheal/variant/{result.variant.__qualname__}")
+        self.logger.debug("%s extracted %s", result.variant.__qualname__, response.url)
         return result.item
 
     def closed(self, reason: str) -> None:

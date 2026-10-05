@@ -30,10 +30,12 @@ which the agent can inspect through scrapy-mcp.
 Repair records (`repairs/`) live in the container and go with it; the job log
 has the agent's events, the gate output and the outcome.
 
+Tested: job 880721/4/5, Case A, 566/566 fully correct.
+
 ## Test the image locally first
 
     docker build -t scrapy-phoenix .
-    docker run --rm --user 4321:4321 -v "$PWD/output/ct:/out" scrapy-phoenix \
+    docker run --rm --user 4321:4321 -w /tmp -v "$PWD/output/ct:/out" scrapy-phoenix \
         scrapy crawl sandbox_store -a openai_api_key="$OPENAI_API_KEY" \
         -O /out/items.jsonl -s SELFHEAL_ENABLED=1 -s SELFHEAL_REPAIRS_DIR=/out/repairs \
         -s SANDBOX_URL=<sandbox>/sandbox-store/

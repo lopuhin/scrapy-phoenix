@@ -556,8 +556,9 @@ class Healer:
         m["paused_s"] = round(time.monotonic() - repair.started, 1)
         self.active = None
         self._record(repair)
-        logger.warning("selfheal: resumed after %ss; re-queued %d held request(s)",
-                       m["paused_s"], len(repair.held))
+        logger.warning("selfheal: resumed after %ss; re-queued %d held request(s); "
+                       "agent $%s, %s turns", m["paused_s"], len(repair.held),
+                       m.get("cost_usd"), m.get("num_turns"))
 
     async def _canary(self, repair: Repair, loaded: list[str]) -> None:
         """Watch the next pages of this type: are they routed to the new variant?"""

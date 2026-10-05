@@ -219,6 +219,15 @@ extracted fully correctly or refused. **No bad item was delivered.**
     the agent with `bypassPermissions`. With that (and pytest in the image),
     Case A against the deployed sandbox healed: 566/566, $0.13, first try.
 
+30. **It runs on Scrapy Cloud.** Job 880721/4/5: Case A against the deployed
+    sandbox paused 99 s, hot-loaded the variant, resumed, and delivered
+    566/566 fully correct items. Getting there took two fixes the local
+    container didn't catch: the project root must come from where `selfheal`
+    lives (jobs run in `/scrapinghub`, the project is in `/app`), and the
+    error for a failed `git ls-files` must say why. The OpenAI key is a
+    spider argument (visible in job metadata; a temporary key), passed to
+    Codex as a per-run secret; it appears nowhere in the log.
+
 ### Still unverified
 
 - The retry path where the agent fixes its own module after the healer's gate

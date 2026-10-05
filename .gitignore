@@ -6,3 +6,4 @@ __pycache__/
 output/
 repairs/
 sandbox/settings.env
+.releases

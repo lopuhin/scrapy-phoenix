@@ -19,6 +19,7 @@ import asyncio
 import hashlib
 import importlib
 import json
+import logging
 import subprocess
 import sys
 from dataclasses import asdict, dataclass, field
@@ -33,6 +34,8 @@ from web_poet.utils import get_fq_class_name
 
 from .dispatch import Variants
 from .fixtures import save_fixture
+
+logger = logging.getLogger(__name__)
 
 # Fields that must not be identical across held pages of different URLs:
 # a variant extracting e.g. the site header instead of the product name would
@@ -96,14 +99,28 @@ def load_held(directory: Path) -> list[HeldPage]:
 # -- scope ------------------------------------------------------------------------
 
 
+# Skipped when the project isn't a git repo (e.g. as deployed).
+_NOT_SOURCE = {".git", "__pycache__", ".pytest_cache", ".scrapy", "repairs", "output"}
+
+
 def tracked_files(root: Path) -> dict[str, str]:
-    """``path → sha256`` for every file git would see (tracked + untracked, not ignored)."""
-    out = subprocess.run(
-        ["git", "ls-files", "-co", "--exclude-standard", "-z"],
-        cwd=root, check=True, capture_output=True,
-    ).stdout.decode()
+    """``path → sha256`` for every file git would see (tracked + untracked, not ignored).
+
+    Outside a git repo, every file under ``root`` except caches and records.
+    """
+    proc = subprocess.run(
+        ["git", "ls-files", "-co", "--exclude-standard", "-z"], cwd=root, capture_output=True,
+    )
+    if proc.returncode == 0:
+        rels = proc.stdout.decode().split("\0")
+    else:
+        logger.warning("git ls-files failed in %s (%s); listing files instead", root,
+                       proc.stderr.decode(errors="replace").strip())
+        rels = [str(p.relative_to(root)) for p in sorted(root.rglob("*"))
+                if not (_NOT_SOURCE & set(p.relative_to(root).parts))
+                and not any(part.endswith(".egg-info") for part in p.parts)]
     files = {}
-    for rel in filter(None, out.split("\0")):
+    for rel in filter(None, rels):
         path = root / rel
         if path.is_file():
             files[rel] = hashlib.sha256(path.read_bytes()).hexdigest()

@@ -1,5 +1,4 @@
 # Deploy as a custom image (`shub image upload`); see deploy/README.md.
-# The project id goes here once the Scrapy Cloud project exists.
 projects:
-  default: 0
+  default: 880721
 image: true

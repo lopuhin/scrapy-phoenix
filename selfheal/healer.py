@@ -55,7 +55,9 @@ from .gate import changed_files, check_scope, save_held, tracked_files
 
 logger = logging.getLogger(__name__)
 
-ROOT = Path.cwd()
+# The project: where selfheal lives, not the working directory (on Scrapy Cloud
+# jobs run in /scrapinghub, the project is in /app).
+ROOT = Path(__file__).resolve().parents[1]
 
 
 class RepairProposal(pydantic.BaseModel):

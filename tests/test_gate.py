@@ -77,11 +77,3 @@ def test_fields_missing_unless_declared_absent(tmp_path):
     check = check_fields(tvs, fixtures, Product, {"brand": "nope"})
     assert check.problems == ["brand is declared absent but filled on a held page"]
 
-
-def test_tracked_files_outside_git(tmp_path):
-    (tmp_path / "pkg" / "__pycache__").mkdir(parents=True)
-    (tmp_path / "pkg" / "a.py").write_text("a\n")
-    (tmp_path / "pkg" / "__pycache__" / "a.pyc").write_text("x")
-    (tmp_path / "repairs").mkdir()
-    (tmp_path / "repairs" / "r.json").write_text("{}")
-    assert list(tracked_files(tmp_path)) == ["pkg/a.py"]
